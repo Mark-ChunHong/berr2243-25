@@ -24,8 +24,14 @@ const count = drivers.push(
     {        
     name: "Smith",
     vehicleType: "Proton",
-    isAvailable: false,
+    isAvailable: true,
     rating: 4.0
+    },
+    {
+    name: "Mark",
+    vehicleType: "Sedan",
+    isAvailable: true,
+    rating: 4.6
     }
 );
 
