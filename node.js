@@ -9,7 +9,7 @@ const drivers = [
         rating: 4.8
     },
     {
-        name: "Alice Smith",
+        name: "John Doe",
         vehicleType: "SUV",
         isAvailable: false,
         rating: 4.5
@@ -57,16 +57,22 @@ async function main() {
     }).toArray();
     console.log("\nAvailable drivers:", availableDrivers)
 
-    const updateResult = await db.collection('drivers').updateOne(
+    const updateResult = await db.collection('drivers').updateMany(
         { name: "John Doe" },
         { $inc: { rating: 0.1 } }
     );
     
     console.log(`Driver updated with result: ${updateResult}`);
 
+    const deleteResult = await db.collection('drivers').deleteMany({ isAvailable: true });
+    console.log(`Driver deleted with result: ${JSON.stringify(deleteResult)}`);
+    
     } finally {
         await client.close();
     }
+
+  
+    
 }
 
 main();
