@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ride-Hailing Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #1e3a8a;
+      --primary-light: #3b82f6;
+      --primary-bg: #eff6ff;
+      --text-color: #1e293b;
+      --gray-light: #e5e7eb;
+      --white: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      background-color: var(--primary-bg);
+      color: var(--text-color);
+    }
+
+    header {
+      background: linear-gradient(90deg, #1e3a8a, #2563eb);
+      padding: 20px 40px;
+      color: var(--white);
+      font-size: 1.6rem;
+      font-weight: 600;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .container {
+      padding: 40px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    h2, h3 {
+      color: var(--primary-color);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: var(--white);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    th, td {
+      padding: 14px 18px;
+      text-align: left;
+      border-bottom: 1px solid var(--gray-light);
+    }
+
+    th {
+      background-color: #e0e7ff;
+      font-weight: 600;
+    }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .badge.requested { background-color: #3b82f6; color: #fff; }
+    .badge.completed { background-color: #10b981; color: #fff; }
+    .badge.cancelled  { background-color: #ef4444; color: #fff; }
+
+    form, .form-group {
+      margin-top: 30px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    input {
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      flex: 1 1 220px;
+      font-size: 1rem;
+    }
+
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #1e40af;
+    }
+
+    #message {
+      margin-top: 15px;
+      font-weight: 600;
+    }
+
+    .success { color: #10b981; }
+    .error { color: #ef4444; }
+
+    @media (max-width: 768px) {
+      form, .form-group {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    Ride-Hailing Admin Dashboard
+  </header>
+
+  <div class="container">
+    <h2>📋 All Rides</h2>
+  
+    <table id="ridesTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Pickup</th>
+          <th>Destination</th>
+          <th>Driver</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  
+    <h3>➕ Add New Ride</h3>
+    <form id="rideForm">
+      <input type="text" id="pickup" placeholder="Pickup Location" required>
+      <input type="text" id="destination" placeholder="Destination" required>
+      <input type="text" id="driverId" placeholder="Driver ID" required>
+      <input type="text" id="status" placeholder="Status" value="requested" required>
+      <button type="submit">Create Ride</button>
+    </form>
+  
+    <h3>🔄 Update Ride Status</h3>
+    <form id="updateForm">
+      <input type="text" id="updateId" placeholder="Ride ID to Update" required>
+      <select id="newStatus" required>
+        <option value="">Select Status</option>
+        <option value="requested">Requested</option>
+        <option value="completed">Completed</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+      <button type="submit">Update Status</button>
+    </form>
+    
+    <h3>🗑️ Delete Ride by ID</h3>
+    <div class="form-group">
+      <input type="text" id="deleteId" placeholder="Ride ID">
+      <button onclick="deleteRide()">Delete Ride</button>
+    </div>
+  
+    <p id="message"></p>
+  </div>
+  
+  <script>
+    const API_URL = 'http://localhost:3000/rides';
+  
+    async function fetchRides() {
+      const res = await fetch(API_URL);
+      const rides = await res.json();
+      const tbody = document.querySelector("#ridesTable tbody");
+      tbody.innerHTML = '';
+  
+      rides.forEach(ride => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${ride._id}</td>
+          <td>${ride.pickupLocation}</td>
+          <td>${ride.destination}</td>
+          <td>${ride.driverId}</td>
+          <td><span class="badge ${ride.status.toLowerCase()}">${ride.status}</span></td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+  
+    document.getElementById("rideForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const pickup = document.getElementById("pickup").value;
+      const destination = document.getElementById("destination").value;
+      const driverId = document.getElementById("driverId").value;
+      const status = document.getElementById("status").value;
+  
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pickupLocation: pickup, destination, driverId, status })
+      });
+  
+      const msg = document.getElementById("message");
+  
+      if (res.ok) {
+        msg.textContent = "✅ Ride created successfully!";
+        msg.className = "success";
+        fetchRides();
+        e.target.reset();
+      } else {
+        msg.textContent = "❌ Failed to create ride.";
+        msg.className = "error";
+      }
+    });
+  
+    document.getElementById("updateForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const id = document.getElementById("updateId").value;
+      const status = document.getElementById("newStatus").value;
+  
+      const res = await fetch(`${API_URL}/${id}`, {
+        method: "PATCH",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+  
+      const msg = document.getElementById("message");
+      if (res.ok) {
+        msg.textContent = "✅ Ride status updated!";
+        msg.className = "success";
+        fetchRides();
+        e.target.reset();
+      } else {
+        msg.textContent = "❌ Failed to update ride.";
+        msg.className = "error";
+      }
+    });
+
+    async function deleteRide() {
+      const id = document.getElementById("deleteId").value;
+      const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+  
+      const msg = document.getElementById("message");
+      if (res.ok) {
+        msg.textContent = "🗑️ Ride deleted successfully!";
+        msg.className = "success";
+        fetchRides();
+      } else {
+        msg.textContent = "❌ Failed to delete ride.";
+        msg.className = "error";
+      }
+    }
+  
+    fetchRides();
+  </script>
+  
