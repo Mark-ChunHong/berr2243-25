@@ -124,8 +124,8 @@ app.get('/users/:id', async (req, res) => {
         res.status(400).json({ error: "Invalid user ID" });
     }
 });
+//patch
 
-// PUT /users/:id – Update a user
 app.patch('/users/:id', async (req, res) => {
     try {
         const result = await db.collection('users').updateOne(
@@ -142,8 +142,7 @@ app.patch('/users/:id', async (req, res) => {
         res.status(400).json({ error: "Invalid user ID or data" });
     }
 });
-
-// DELETE /users/:id – Delete a user
+//delete
 app.delete('/users/:id', async (req, res) => {
     const { id } = req.params;
     try {
