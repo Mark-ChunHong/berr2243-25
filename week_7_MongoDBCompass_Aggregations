@@ -1,0 +1,58 @@
+[
+  {
+    "$match": {
+      "name": { "$in": ["Alice", "Bob"] }
+    }
+  },
+  {
+    "$lookup": {
+      "from": "rides",
+      "localField": "name",
+      "foreignField": "passenger",
+      "as": "userRides"
+    }
+  },
+  {
+    "$unwind": {
+      "path": "$userRides",
+      "preserveNullAndEmptyArrays": true
+    }
+  },
+  {
+    "$group": {
+      "_id": "$_id",
+      "name": { "$first": "$name" },
+      "totalRides": {
+        "$sum": {
+          "$cond": [
+            { "$ifNull": ["$userRides", false] },
+            1,
+            0
+          ]
+        }
+      },
+      "totalFare": { "$sum": "$userRides.fare" },
+      "totalDistance": { "$sum": "$userRides.distanceKm" }
+    }
+  },
+  {
+    "$project": {
+      "_id": 0,
+      "name": 1,
+      "totalRides": 1,
+      "totalFare": { "$round": ["$totalFare", 2] },
+      "avgDistance": {
+        "$round": [
+          {
+            "$cond": [
+              { "$eq": ["$totalRides", 0] },
+              null,
+              { "$divide": ["$totalDistance", "$totalRides"] }
+            ]
+          },
+          2
+        ]
+      }
+    }
+  }
+]
