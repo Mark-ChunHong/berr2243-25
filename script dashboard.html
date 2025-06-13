@@ -1,0 +1,304 @@
+// Parse the API response
+const responseData = pm.response.json().data;
+
+// Calculate additional metrics
+const totalFares = responseData.reduce((sum, passenger) => sum + passenger.totalFare, 0);
+const avgDistanceAll = (responseData.reduce((sum, passenger) => sum + passenger.avgDistance, 0) / responseData.length);
+
+// HTML template for the dashboard
+const dashboardTemplate = `
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Passenger Analytics Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --secondary: #3f37c9;
+      --accent: #4895ef;
+      --dark: #1b263b;
+      --light: #f8f9fa;
+    }
+    
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #f5f7fa;
+      color: var(--dark);
+      padding: 20px;
+      margin: 0;
+      line-height: 1.6;
+    }
+    
+    .dashboard-header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      padding: 2rem;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    
+    .metrics-container {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+      gap: 1rem;
+    }
+    
+    .metric-card {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      flex: 1;
+      min-width: 200px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s ease;
+      border-left: 4px solid var(--accent);
+    }
+    
+    .metric-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .metric-value {
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin: 0.5rem 0;
+    }
+    
+    .metric-label {
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+    
+    .chart-container {
+      background: white;
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+    }
+    
+    .chart-container:hover {
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .chart-title {
+      color: var(--dark);
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 0.5rem;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 2rem 0;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    th {
+      background-color: var(--primary);
+      color: white;
+      padding: 12px 15px;
+      text-align: left;
+    }
+    
+    td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    tr:hover {
+      background-color: #f8f9fa;
+    }
+    
+    .highlight {
+      font-weight: 600;
+      color: var(--secondary);
+    }
+    
+    .footer {
+      text-align: center;
+      margin-top: 2rem;
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-header">
+    <h1>Passenger Ride Analytics</h1>
+    <p>Comprehensive overview of passenger ride statistics</p>
+  </div>
+  
+  <div class="metrics-container">
+    <div class="metric-card">
+      <div class="metric-label">Total Passengers</div>
+      <div class="metric-value">${responseData.length}</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Total Fares</div>
+      <div class="metric-value">RM${totalFares.toFixed(2)}</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Avg. Distance</div>
+      <div class="metric-value">${avgDistanceAll.toFixed(2)} km</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Total Rides</div>
+      <div class="metric-value">${responseData.reduce((sum, p) => sum + p.totalRides, 0)}</div>
+    </div>
+  </div>
+  
+  <div class="chart-container">
+    <h2 class="chart-title">Total Rides per Passenger</h2>
+    <canvas id="ridesChart"></canvas>
+  </div>
+  
+  <div class="chart-container">
+    <h2 class="chart-title">Fare Distribution</h2>
+    <canvas id="fareChart"></canvas>
+  </div>
+  
+  <div class="chart-container">
+    <h2 class="chart-title">Passenger Performance</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Passenger</th>
+          <th>Total Rides</th>
+          <th>Total Fare (RM)</th>
+          <th>Avg Distance (km)</th>
+          <th>Fare per Ride (RM)</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${responseData.map(passenger => `
+          <tr>
+            <td class="highlight">${passenger.name}</td>
+            <td>${passenger.totalRides}</td>
+            <td>RM${passenger.totalFare.toFixed(2)}</td>
+            <td>${passenger.avgDistance.toFixed(2)}</td>
+            <td>RM${(passenger.totalFare / passenger.totalRides).toFixed(2)}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  </div>
+  
+  <div class="footer">
+    <p>Report generated on ${new Date().toLocaleString()} | E-Hailing Analytics</p>
+  </div>
+
+  <script>
+    // Animation for metric cards
+    anime({
+      targets: '.metric-card',
+      translateY: [20, 0],
+      opacity: [0, 1],
+      delay: anime.stagger(100),
+      duration: 800,
+      easing: 'easeOutExpo'
+    });
+    
+    // Bar Chart (Total Rides)
+    new Chart(
+      document.getElementById('ridesChart'),
+      {
+        type: 'bar',
+        data: {
+          labels: ${JSON.stringify(responseData.map(p => p.name))},
+          datasets: [{
+            label: 'Total Rides',
+            data: ${JSON.stringify(responseData.map(p => p.totalRides))},
+            backgroundColor: 'rgba(67, 97, 238, 0.7)',
+            borderColor: 'rgba(67, 97, 238, 1)',
+            borderWidth: 1,
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return \`\${context.dataset.label}: \${context.raw}\`;
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1
+              }
+            }
+          }
+        }
+      }
+    );
+
+    // Doughnut Chart (Total Fare)
+    new Chart(
+      document.getElementById('fareChart'),
+      {
+        type: 'doughnut',
+        data: {
+          labels: ${JSON.stringify(responseData.map(p => p.name))},
+          datasets: [{
+            label: 'Total Fare (RM)',
+            data: ${JSON.stringify(responseData.map(p => p.totalFare))},
+            backgroundColor: [
+              'rgba(67, 97, 238, 0.7)',
+              'rgba(63, 55, 201, 0.7)',
+              'rgba(72, 149, 239, 0.7)',
+              'rgba(27, 38, 59, 0.7)'
+            ],
+            borderWidth: 1,
+            hoverOffset: 10
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'right',
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return \`\${context.label}: RM\${context.raw.toFixed(2)}\`;
+                }
+              }
+            }
+          },
+          cutout: '70%'
+        }
+      }
+    );
+  </script>
+</body>
+</html>
+`;
+
+// Render the dashboard
+pm.visualizer.set(dashboardTemplate);
