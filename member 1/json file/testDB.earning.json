@@ -1,0 +1,55 @@
+[{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e3f"
+  },
+  "Earning_ID": "ERN4001",
+  "Driver_ID": "DRV5001",
+  "Payments_ID": "PAY3001",
+  "Total_Earn": 150.5,
+  "This_Ride_Earning": 12.4,
+  "Service_Fee": 3.1
+},
+{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e40"
+  },
+  "Earning_ID": "ERN4002",
+  "Driver_ID": "DRV5002",
+  "Payments_ID": "PAY3002",
+  "Total_Earn": 220,
+  "This_Ride_Earning": 9.6,
+  "Service_Fee": 2.4
+},
+{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e41"
+  },
+  "Earning_ID": "ERN4003",
+  "Driver_ID": "DRV5003",
+  "Payments_ID": "PAY3003",
+  "Total_Earn": 95.25,
+  "This_Ride_Earning": 16,
+  "Service_Fee": 4
+},
+{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e42"
+  },
+  "Earning_ID": "ERN4004",
+  "Driver_ID": "DRV5001",
+  "Payments_ID": "PAY3004",
+  "Total_Earn": 180.75,
+  "This_Ride_Earning": 15,
+  "Service_Fee": 3.75
+},
+{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e43"
+  },
+  "Earning_ID": "ERN4005",
+  "Driver_ID": "DRV5004",
+  "Payments_ID": "PAY3005",
+  "Total_Earn": 310,
+  "This_Ride_Earning": 0,
+  "Service_Fee": 0
+}]

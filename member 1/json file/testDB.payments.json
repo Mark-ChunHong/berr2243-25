@@ -1,0 +1,65 @@
+[{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e3a"
+  },
+  "Payments_ID": "PAY3001",
+  "Rides_ID": "RDE2001",
+  "Amount": 15.5,
+  "Payment_method": "Touch 'n Go eWallet",
+  "Status": "Completed",
+  "Transaction_Date": {
+    "$date": "2023-06-01T08:15:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e3b"
+  },
+  "Payments_ID": "PAY3002",
+  "Rides_ID": "RDE2002",
+  "Amount": 12,
+  "Payment_method": "GrabPay",
+  "Status": "Completed",
+  "Transaction_Date": {
+    "$date": "2023-06-02T14:30:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e3c"
+  },
+  "Payments_ID": "PAY3003",
+  "Rides_ID": "RDE2003",
+  "Amount": 20,
+  "Payment_method": "Cash",
+  "Status": "Completed",
+  "Transaction_Date": {
+    "$date": "2023-06-03T18:45:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e3d"
+  },
+  "Payments_ID": "PAY3004",
+  "Rides_ID": "RDE2004",
+  "Amount": 18.75,
+  "Payment_method": "Credit Card",
+  "Status": "Completed",
+  "Transaction_Date": {
+    "$date": "2023-06-04T09:20:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e3e"
+  },
+  "Payments_ID": "PAY3005",
+  "Rides_ID": "RDE2005",
+  "Amount": 10.5,
+  "Payment_method": "Boost",
+  "Status": "Completed",
+  "Transaction_Date": {
+    "$date": "2023-06-05T16:10:00.000Z"
+  }
+}]

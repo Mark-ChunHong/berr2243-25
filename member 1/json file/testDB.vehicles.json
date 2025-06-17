@@ -1,0 +1,45 @@
+[{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e30"
+  },
+  "Vehicle_ID": "VHL6001",
+  "Colour": "Red",
+  "Plate_Number": "JKL 1234",
+  "Type": "Proton Saga"
+},
+{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e31"
+  },
+  "Vehicle_ID": "VHL6002",
+  "Colour": "Blue",
+  "Plate_Number": "MEL 5678",
+  "Type": "Perodua Myvi"
+},
+{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e32"
+  },
+  "Vehicle_ID": "VHL6003",
+  "Colour": "Silver",
+  "Plate_Number": "PNJ 9012",
+  "Type": "Honda City"
+},
+{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e33"
+  },
+  "Vehicle_ID": "VHL6004",
+  "Colour": "Black",
+  "Plate_Number": "KUL 3456",
+  "Type": "Toyota Vios"
+},
+{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e34"
+  },
+  "Vehicle_ID": "VHL6005",
+  "Colour": "White",
+  "Plate_Number": "NSN 7890",
+  "Type": "Proton X70"
+}]

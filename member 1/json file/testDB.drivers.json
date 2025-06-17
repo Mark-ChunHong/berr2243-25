@@ -1,0 +1,60 @@
+[{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e2b"
+  },
+  "Driver_ID": "DRV5001",
+  "Driver_Name": "Ahmad bin Abdullah",
+  "Password": "Ahmad@123",
+  "License_info": "DL12345678",
+  "Vehicle_ID": "VHL6001",
+  "availability": true,
+  "Rating": 4.8
+},
+{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e2c"
+  },
+  "Driver_ID": "DRV5002",
+  "Driver_Name": "Siti Nurhaliza",
+  "Password": "Siti@2023",
+  "License_info": "DL87654321",
+  "Vehicle_ID": "VHL6002",
+  "availability": false,
+  "Rating": 4.5
+},
+{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e2d"
+  },
+  "Driver_ID": "DRV5003",
+  "Driver_Name": "Rajesh Kumar",
+  "Password": "Raj@2023",
+  "License_info": "DL11223344",
+  "Vehicle_ID": "VHL6003",
+  "availability": true,
+  "Rating": 4.9
+},
+{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e2e"
+  },
+  "Driver_ID": "DRV5004",
+  "Driver_Name": "Tan Mei Ling",
+  "Password": "MeiLing@1",
+  "License_info": "DL55667788",
+  "Vehicle_ID": "VHL6004",
+  "availability": true,
+  "Rating": 4.7
+},
+{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e2f"
+  },
+  "Driver_ID": "DRV5005",
+  "Driver_Name": "Mohd Faisal",
+  "Password": "Faisal@22",
+  "License_info": "DL99887766",
+  "Vehicle_ID": "VHL6005",
+  "availability": false,
+  "Rating": 4.6
+}]
