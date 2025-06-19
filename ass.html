@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MyTaxi Dashboard</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #e0f7fa, #fce4ec);
+      color: #333;
+    }
+    header {
+      background-color: #0069d9;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    main {
+      padding: 30px;
+      max-width: 1000px;
+      margin: 40px auto;
+      background: white;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      border-radius: 12px;
+    }
+    section {
+      margin-bottom: 40px;
+      display: none;
+    }
+    h2 {
+      color: #0069d9;
+      border-bottom: 2px solid #ccc;
+      padding-bottom: 10px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 12px;
+    }
+    input, button {
+      padding: 10px;
+      margin-top: 6px;
+      margin-bottom: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 100%;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+    button {
+      background-color: #0069d9;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    pre {
+      background: #f5f5f5;
+      padding: 12px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 14px;
+    }
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>MyTaxi Dashboard</header>
+  <main>
+    <section id="roleSelection" style="display: block;">
+      <h2>Select Your Role</h2>
+      <div class="button-group">
+        <button onclick="selectRole('admin')">Admin</button>
+        <button onclick="selectRole('driver')">Driver</button>
+        <button onclick="selectRole('passenger')">Passenger</button>
+      </div>
+    </section>
+
+    <section id="loginSection">
+      <h2>Login</h2>
+      <label for="userEmail">Username or Email:</label>
+      <input type="text" id="userEmail">
+      <label for="userPassword">Password:</label>
+      <input type="password" id="userPassword">
+      <button onclick="loginUser()">Login</button>
+      <button onclick="returnToRoleSelection()" style="background-color:#6c757d">← Return</button>
+      <div id="userLoginResult"></div>
+    </section>
+
+    <section id="adminPanel">
+      <h2>Admin Panel</h2>
+      <label>User ID:</label>
+      <input type="text" id="viewUserId">
+      <button onclick="viewUser()">View User</button>
+      <pre id="userData"></pre>
+
+      <h3>All Rides</h3>
+      <button onclick="viewAllRides()">View All Rides</button>
+      <pre id="allRidesData"></pre>
+    </section>
+
+    <section id="driverPanel">
+      <h2>Driver Panel</h2>
+      <label>Passenger ID:</label>
+      <input type="text" id="passengerId">
+      <button onclick="viewPassenger()">View Passenger</button>
+
+      <label>User ID (Update):</label>
+      <input type="text" id="updateUserId">
+      <label>New Name:</label>
+      <input type="text" id="updateUserName">
+      <button onclick="updateUser()">Update Profile</button>
+      <div id="updateResult"></div>
+    </section>
+
+    <section id="passengerPanel">
+      <h2>Passenger Panel</h2>
+      <label>Driver ID:</label>
+      <input type="text" id="driverId">
+      <button onclick="viewDriver()">View Driver</button>
+      <pre id="driverData"></pre>
+    </section>
+
+    <section id="logoutSection">
+      <button onclick="logout()" style="background-color:#dc3545">Logout</button>
+    </section>
+  </main>
+
+  <script>
+    const baseUrl = 'http://localhost:3000';
+
+    function selectRole(role) {
+      document.getElementById('roleSelection').style.display = 'none';
+      document.getElementById('loginSection').style.display = 'block';
+      localStorage.setItem('userRole', role);
+    }
+
+    function returnToRoleSelection() {
+      document.getElementById('loginSection').style.display = 'none';
+      document.getElementById('roleSelection').style.display = 'block';
+      localStorage.removeItem('userRole');
+    }
+
+    async function loginUser() {
+      const email = document.getElementById('userEmail').value.trim();
+      const password = document.getElementById('userPassword').value.trim();
+      const role = localStorage.getItem('userRole');
+
+      if (!email || !password) {
+        document.getElementById('userLoginResult').innerText = 'Please enter both email and password.';
+        return;
+      }
+
+      let loginEndpoint = '/auth/login';
+      let body = { Email: email, Password: password };
+
+      if (role === 'driver') {
+        loginEndpoint = '/auth/driver/login';
+        body = { driverId: email, Password: password };
+      } else if (role === 'admin') {
+        loginEndpoint = '/auth/admin/login';
+        body = { Username: email, Password: password };
+      }
+
+      const res = await fetch(`${baseUrl}${loginEndpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      const data = await res.json();
+      document.getElementById('userLoginResult').innerText = JSON.stringify(data, null, 2);
+
+      if (res.status !== 200) return;
+
+      document.getElementById('loginSection').style.display = 'none';
+      document.getElementById('logoutSection').style.display = 'block';
+
+      if (role === 'admin') document.getElementById('adminPanel').style.display = 'block';
+      else if (role === 'driver') document.getElementById('driverPanel').style.display = 'block';
+      else if (role === 'passenger') document.getElementById('passengerPanel').style.display = 'block';
+    }
+
+    function logout() {
+      localStorage.removeItem('userRole');
+      document.getElementById('roleSelection').style.display = 'block';
+      document.getElementById('loginSection').style.display = 'none';
+      document.getElementById('adminPanel').style.display = 'none';
+      document.getElementById('driverPanel').style.display = 'none';
+      document.getElementById('passengerPanel').style.display = 'none';
+      document.getElementById('logoutSection').style.display = 'none';
+      document.getElementById('userEmail').value = '';
+      document.getElementById('userPassword').value = '';
+      document.getElementById('userLoginResult').innerText = '';
+      document.getElementById('userData').innerText = '';
+      document.getElementById('allRidesData').innerText = '';
+    }
+
+    async function viewUser() {
+      const id = document.getElementById('viewUserId').value;
+      const res = await fetch(`${baseUrl}/users/${id}`);
+      const data = await res.json();
+      document.getElementById('userData').innerText = JSON.stringify(data, null, 2);
+    }
+
+    async function viewAllRides() {
+      const res = await fetch(`${baseUrl}/rides`);
+      const data = await res.json();
+      document.getElementById('allRidesData').innerText = JSON.stringify(data, null, 2);
+    }
+
+    async function updateUser() {
+      const id = document.getElementById('updateUserId').value;
+      const name = document.getElementById('updateUserName').value;
+
+      const res = await fetch(`${baseUrl}/users/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ Name: name })
+      });
+      const data = await res.json();
+      document.getElementById('updateResult').innerText = JSON.stringify(data, null, 2);
+    }
+
+    async function viewPassenger() {
+      const id = document.getElementById('passengerId').value;
+      const res = await fetch(`${baseUrl}/passengers/${id}`);
+      const data = await res.json();
+      document.getElementById('passengerData').innerText = JSON.stringify(data, null, 2);
+    }
+
+    async function viewDriver() {
+      const id = document.getElementById('driverId').value;
+      const res = await fetch(`${baseUrl}/drivers/${id}`);
+      const data = await res.json();
+      document.getElementById('driverData').innerText = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>
