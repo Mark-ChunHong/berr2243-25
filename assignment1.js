@@ -290,20 +290,13 @@ const admin = [
 ];
 
 async function main() {
-<<<<<<< HEAD
     const uri = "mongodb+srv://Database_Ass:Database_Ass2025@cluster0.i63ss4u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-=======
-    const uri = "mongodb://localhost:27017";
->>>>>>> 88c93e38d2df22eaaa9912497458a6ab9cc2b4e2
     const client = new MongoClient(uri);
 
     try {
         await client.connect();
-<<<<<<< HEAD
         const db = client.db("Assignment");
-=======
-        const db = client.db("testDB");
->>>>>>> 88c93e38d2df22eaaa9912497458a6ab9cc2b4e2
+
 
         // Initialize all collections
         const usersCollection = db.collection("users");
