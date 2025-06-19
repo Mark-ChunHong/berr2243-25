@@ -1,0 +1,95 @@
+[{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e35"
+  },
+  "Rides_ID": "RDE2001",
+  "User_ID": "USR1001",
+  "Driver_ID": "DRV5001",
+  "Pick_up": "UTeM Main Gate",
+  "Destination": "Melaka Mall",
+  "Status": "completed",
+  "Start_Time": {
+    "$date": "2023-06-01T08:00:00.000Z"
+  },
+  "End_Time": {
+    "$date": "2023-06-01T08:25:00.000Z"
+  },
+  "Distance_KM": 8.5,
+  "Total_Fare": 15.5
+},
+{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e36"
+  },
+  "Rides_ID": "RDE2002",
+  "User_ID": "USR1002",
+  "Driver_ID": "DRV5002",
+  "Pick_up": "Faculty of Engineering",
+  "Destination": "MITC",
+  "Status": "completed",
+  "Start_Time": {
+    "$date": "2023-06-02T14:15:00.000Z"
+  },
+  "End_Time": {
+    "$date": "2023-06-02T14:35:00.000Z"
+  },
+  "Distance_KM": 6.2,
+  "Total_Fare": 12
+},
+{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e37"
+  },
+  "Rides_ID": "RDE2003",
+  "User_ID": "USR1003",
+  "Driver_ID": "DRV5003",
+  "Pick_up": "UTeM Library",
+  "Destination": "Ayer Keroh Bus Terminal",
+  "Status": "completed",
+  "Start_Time": {
+    "$date": "2023-06-03T18:30:00.000Z"
+  },
+  "End_Time": {
+    "$date": "2023-06-03T19:00:00.000Z"
+  },
+  "Distance_KM": 6.5,
+  "Total_Fare": 20
+},
+{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e38"
+  },
+  "Rides_ID": "RDE2004",
+  "User_ID": "USR1004",
+  "Driver_ID": "DRV5001",
+  "Pick_up": "Student Residence",
+  "Destination": "Jonker Street",
+  "Status": "completed",
+  "Start_Time": {
+    "$date": "2023-06-04T09:05:00.000Z"
+  },
+  "End_Time": {
+    "$date": "2023-06-04T09:40:00.000Z"
+  },
+  "Distance_KM": 9,
+  "Total_Fare": 18.75
+},
+{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e39"
+  },
+  "Rides_ID": "RDE2005",
+  "User_ID": "USR1005",
+  "Driver_ID": "DRV5004",
+  "Pick_up": "Sports Complex",
+  "Destination": "Mahkota Medical Center",
+  "Status": "completed",
+  "Start_Time": {
+    "$date": "2023-06-05T16:00:00.000Z"
+  },
+  "End_Time": {
+    "$date": "2023-06-05T16:30:00.000Z"
+  },
+  "Distance_KM": 8.8,
+  "Total_Fare": 10.5
+}]

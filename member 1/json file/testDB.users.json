@@ -1,0 +1,70 @@
+[{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e26"
+  },
+  "User_ID": "USR1001",
+  "Name": "Lim Wei Jie",
+  "Email": "limweijie@student.utem.edu.my",
+  "Password": "Lim@2023",
+  "Phone": "+60123456789",
+  "Delete_Account": false,
+  "Registration_Date": {
+    "$date": "2023-01-15T09:30:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e27"
+  },
+  "User_ID": "USR1002",
+  "Name": "Nurul Aisyah",
+  "Email": "nurul@student.utem.edu.my",
+  "Password": "Nurul@123",
+  "Phone": "+60198765432",
+  "Delete_Account": false,
+  "Registration_Date": {
+    "$date": "2023-02-20T14:15:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e28"
+  },
+  "User_ID": "USR1003",
+  "Name": "Rajvinder Singh",
+  "Email": "raj@student.utem.edu.my",
+  "Password": "Raj@2023",
+  "Phone": "+60168889900",
+  "Delete_Account": false,
+  "Registration_Date": {
+    "$date": "2023-03-05T11:45:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e29"
+  },
+  "User_ID": "USR1004",
+  "Name": "Tan Mei Ling",
+  "Email": "tan@student.utem.edu.my",
+  "Password": "MeiLing@1",
+  "Phone": "+60127778899",
+  "Delete_Account": false,
+  "Registration_Date": {
+    "$date": "2023-04-10T16:20:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e2a"
+  },
+  "User_ID": "USR1005",
+  "Name": "Ahmad Firdaus",
+  "Email": "ahmad@student.utem.edu.my",
+  "Password": "Ahmad@123",
+  "Phone": "+60139998877",
+  "Delete_Account": false,
+  "Registration_Date": {
+    "$date": "2023-05-12T10:00:00.000Z"
+  }
+}]

@@ -1,0 +1,24 @@
+[{
+  "_id": {
+    "$oid": "68503c4343bcda2da3be9e44"
+  },
+  "Admin_ID": "ADM001",
+  "Password": "Admin@123",
+  "User_ID": [
+    "USR1001",
+    "USR1002",
+    "USR1003",
+    "USR1004",
+    "USR1005"
+  ],
+  "Rides_ID": [
+    "RDE2001",
+    "RDE2002",
+    "RDE2003",
+    "RDE2004",
+    "RDE2005"
+  ],
+  "Last_Login": {
+    "$date": "2025-06-16T15:46:11.534Z"
+  }
+}]
