@@ -3,292 +3,292 @@ const { MongoClient, ObjectId } = require('mongodb');
 // Sample data for all collections (5 documents each)
 const users = [
     {
-        User_ID: "USR1001",
-        Name: "Lim Wei Jie",
-        Email: "limweijie@student.utem.edu.my",
-        Password: "Lim@2023",
-        Phone: "+60123456789",
-        Delete_Account: false,
-        Registration_Date: new Date("2023-01-15T09:30:00Z")
+        userId: "USR1001",                   
+        name: "Lim Wei Jie",                  
+        email: "limweijie@student.utem.edu.my", 
+        password: "Lim@2023",                 
+        phone: "+60123456789",                
+        deleteAccount: false,                 
+        registrationDate: new Date("2023-01-15T09:30:00Z") 
     },
     {
-        User_ID: "USR1002",
-        Name: "Nurul Aisyah",
-        Email: "nurul@student.utem.edu.my",
-        Password: "Nurul@123",
-        Phone: "+60198765432",
-        Delete_Account: false,
-        Registration_Date: new Date("2023-02-20T14:15:00Z")
+        userId: "USR1002",
+        name: "Nurul Aisyah",
+        email: "nurul@student.utem.edu.my",
+        password: "Nurul@123",
+        phone: "+60198765432",
+        deleteAccount: false,
+        registrationDate: new Date("2023-02-20T14:15:00Z")
     },
     {
-        User_ID: "USR1003",
-        Name: "Rajvinder Singh",
-        Email: "raj@student.utem.edu.my",
-        Password: "Raj@2023",
-        Phone: "+60168889900",
-        Delete_Account: false,
-        Registration_Date: new Date("2023-03-05T11:45:00Z")
+        userId: "USR1003",
+        name: "Rajvinder Singh",
+        email: "raj@student.utem.edu.my",
+        password: "Raj@2023",
+        phone: "+60168889900",
+        deleteAccount: false,
+        registrationDate: new Date("2023-03-05T11:45:00Z")
     },
     {
-        User_ID: "USR1004",
-        Name: "Tan Mei Ling",
-        Email: "tan@student.utem.edu.my",
-        Password: "MeiLing@1",
-        Phone: "+60127778899",
-        Delete_Account: false,
-        Registration_Date: new Date("2023-04-10T16:20:00Z")
+        userId: "USR1004",
+        name: "Tan Mei Ling",
+        email: "tan@student.utem.edu.my",
+        password: "MeiLing@1",
+        phone: "+60127778899",
+        deleteAccount: false,
+        registrationDate: new Date("2023-04-10T16:20:00Z")
     },
     {
-        User_ID: "USR1005",
-        Name: "Ahmad Firdaus",
-        Email: "ahmad@student.utem.edu.my",
-        Password: "Ahmad@123",
-        Phone: "+60139998877",
-        Delete_Account: false,
-        Registration_Date: new Date("2023-05-12T10:00:00Z")
+        userId: "USR1005",
+        name: "Ahmad Firdaus",
+        email: "ahmad@student.utem.edu.my",
+        password: "Ahmad@123",
+        phone: "+60139998877",
+        deleteAccount: false,
+        registrationDate: new Date("2023-05-12T10:00:00Z")
     }
 ];
 
 const rides = [
     {
-        Rides_ID: "RDE2001",
-        User_ID: "USR1001",
-        Driver_ID: "DRV5001",
-        Pick_up: "UTeM Main Gate",
-        Destination: "Melaka Mall",
-        Status: "completed",
-        Start_Time: "2023-06-01T08:00:00Z",
-        End_Time: "2023-06-01T08:25:00Z",
-        Distance_KM: 8.5,
-        Total_Fare: 15.50
+        rideId: "RDE2001",                    
+        userId: "USR1001",                    
+        driverId: "DRV5001",                  
+        pickUp: "UTeM Main Gate",             
+        destination: "Melaka Mall",           
+        status: "completed",                  
+        startTime: new Date("2023-06-01T08:00:00Z"), 
+        endTime: new Date("2023-06-01T08:25:00Z"),   
+        distanceKm: 8.5,                      
+        totalFare: 15.50                      
     },
     {
-        Rides_ID: "RDE2002",
-        User_ID: "USR1002",
-        Driver_ID: "DRV5002",
-        Pick_up: "Faculty of Engineering",
-        Destination: "MITC",
-        Status: "completed",
-        Start_Time: "2023-06-02T14:15:00Z",
-        End_Time: "2023-06-02T14:35:00Z",
-        Distance_KM: 6.2,
-        Total_Fare: 12.00
+        rideId: "RDE2002",
+        userId: "USR1002",
+        driverId: "DRV5002",
+        pickUp: "Faculty of Engineering",
+        destination: "MITC",
+        status: "completed",
+        startTime: new Date("2023-06-02T14:15:00Z"),
+        endTime: new Date("2023-06-02T14:35:00Z"),
+        distanceKm: 6.2,
+        totalFare: 12.00
     },
     {
-        Rides_ID: "RDE2003",
-        User_ID: "USR1003",
-        Driver_ID: "DRV5003",
-        Pick_up: "UTeM Library",
-        Destination: "Ayer Keroh Bus Terminal",
-        Status: "completed",
-        Start_Time: "2023-06-03T18:30:00Z",
-        End_Time: "2023-06-03T19:00:00Z",
-        Distance_KM: 6.5,
-        Total_Fare: 20.00
+        rideId: "RDE2003",
+        userId: "USR1003",
+        driverId: "DRV5003",
+        pickUp: "UTeM Library",
+        destination: "Ayer Keroh Bus Terminal",
+        status: "completed",
+        startTime: new Date("2023-06-03T18:30:00Z"),
+        endTime: new Date("2023-06-03T19:00:00Z"),
+        distanceKm: 6.5,
+        totalFare: 20.00
     },
     {
-        Rides_ID: "RDE2004",
-        User_ID: "USR1004",
-        Driver_ID: "DRV5001",
-        Pick_up: "Student Residence",
-        Destination: "Jonker Street",
-        Status: "completed",
-        Start_Time: "2023-06-04T09:05:00Z",
-        End_Time: "2023-06-04T09:40:00Z",
-        Distance_KM: 9.0,
-        Total_Fare: 18.75
+        rideId: "RDE2004",
+        userId: "USR1004",
+        driverId: "DRV5001",
+        pickUp: "Student Residence",
+        destination: "Jonker Street",
+        status: "completed",
+        startTime: new Date("2023-06-04T09:05:00Z"),
+        endTime: new Date("2023-06-04T09:40:00Z"),
+        distanceKm: 9.0,
+        totalFare: 18.75
     },
     {
-        Rides_ID: "RDE2005",
-        User_ID: "USR1005",
-        Driver_ID: "DRV5004",
-        Pick_up: "Sports Complex",
-        Destination: "Mahkota Medical Center",
-        Status: "completed",
-        Start_Time: "2023-06-05T16:00:00Z",
-        End_Time: "2023-06-05T16:30:00Z",
-        Distance_KM: 8.8,
-        Total_Fare: 10.50
+        rideId: "RDE2005",
+        userId: "USR1005",
+        driverId: "DRV5004",
+        pickUp: "Sports Complex",
+        destination: "Mahkota Medical Center",
+        status: "completed",
+        startTime: new Date("2023-06-05T16:00:00Z"),
+        endTime: new Date("2023-06-05T16:30:00Z"),
+        distanceKm: 8.8,
+        totalFare: 10.50
     }
 ];
 
 const payments = [
     {
-        Payments_ID: "PAY3001",
-        Rides_ID: "RDE2001",
-        Amount: 15.50,
-        Payment_method: "Touch 'n Go eWallet",
-        Status: "Completed",
-        Transaction_Date: "2023-06-01T08:15:00Z"
+        paymentId: "PAY3001",                 
+        rideId: "RDE2001",                    
+        amount: 15.50,                        
+        paymentMethod: "Touch 'n Go eWallet", 
+        status: "Completed",                  
+        transactionDate: new Date("2023-06-01T08:15:00Z") 
     },
     {
-        Payments_ID: "PAY3002",
-        Rides_ID: "RDE2002",
-        Amount: 12.00,
-        Payment_method: "GrabPay",
-        Status: "Completed",
-        Transaction_Date: "2023-06-02T14:30:00Z"
+        paymentId: "PAY3002",
+        rideId: "RDE2002",
+        amount: 12.00,
+        paymentMethod: "GrabPay",
+        status: "Completed",
+        transactionDate: new Date("2023-06-02T14:30:00Z")
     },
     {
-        Payments_ID: "PAY3003",
-        Rides_ID: "RDE2003",
-        Amount: 20.00,
-        Payment_method: "Cash",
-        Status: "Completed",
-        Transaction_Date: "2023-06-03T18:45:00Z"
+        paymentId: "PAY3003",
+        rideId: "RDE2003",
+        amount: 20.00,
+        paymentMethod: "Cash",
+        status: "Completed",
+        transactionDate: new Date("2023-06-03T18:45:00Z")
     },
     {
-        Payments_ID: "PAY3004",
-        Rides_ID: "RDE2004",
-        Amount: 18.75,
-        Payment_method: "Credit Card",
-        Status: "Completed",
-        Transaction_Date: "2023-06-04T09:20:00Z"
+        paymentId: "PAY3004",
+        rideId: "RDE2004",
+        amount: 18.75,
+        paymentMethod: "Credit Card",
+        status: "Completed",
+        transactionDate: new Date("2023-06-04T09:20:00Z")
     },
     {
-        Payments_ID: "PAY3005",
-        Rides_ID: "RDE2005",
-        Amount: 10.50,
-        Payment_method: "Boost",
-        Status: "Completed",
-        Transaction_Date: "2023-06-05T16:10:00Z"
+        paymentId: "PAY3005",
+        rideId: "RDE2005",
+        amount: 10.50,
+        paymentMethod: "Boost",
+        status: "Completed",
+        transactionDate: new Date("2023-06-05T16:10:00Z")
     }
 ];
 
 const drivers = [
     {
-        Driver_ID: "DRV5001",
-        Driver_Name: "Ahmad bin Abdullah",
-        Password: "Ahmad@123",
-        License_info: "DL12345678",
-        Vehicle_ID: "VHL6001",
-        availability: true,
-        Rating: 4.8
+        driverId: "DRV5001",                  
+        driverName: "Ahmad bin Abdullah",     
+        password: "Ahmad@123",                
+        licenseInfo: "DL12345678",            
+        vehicleId: "VHL6001",                 
+        availability: true,                   
+        rating: 4.8                           
     },
     {
-        Driver_ID: "DRV5002",
-        Driver_Name: "Siti Nurhaliza",
-        Password: "Siti@2023",
-        License_info: "DL87654321",
-        Vehicle_ID: "VHL6002",
+        driverId: "DRV5002",
+        driverName: "Siti Nurhaliza",
+        password: "Siti@2023",
+        licenseInfo: "DL87654321",
+        vehicleId: "VHL6002",
         availability: false,
-        Rating: 4.5
+        rating: 4.5
     },
     {
-        Driver_ID: "DRV5003",
-        Driver_Name: "Rajesh Kumar",
-        Password: "Raj@2023",
-        License_info: "DL11223344",
-        Vehicle_ID: "VHL6003",
+        driverId: "DRV5003",
+        driverName: "Rajesh Kumar",
+        password: "Raj@2023",
+        licenseInfo: "DL11223344",
+        vehicleId: "VHL6003",
         availability: true,
-        Rating: 4.9
+        rating: 4.9
     },
     {
-        Driver_ID: "DRV5004",
-        Driver_Name: "Tan Mei Ling",
-        Password: "MeiLing@1",
-        License_info: "DL55667788",
-        Vehicle_ID: "VHL6004",
+        driverId: "DRV5004",
+        driverName: "Tan Mei Ling",
+        password: "MeiLing@1",
+        licenseInfo: "DL55667788",
+        vehicleId: "VHL6004",
         availability: true,
-        Rating: 4.7
+        rating: 4.7
     },
     {
-        Driver_ID: "DRV5005",
-        Driver_Name: "Mohd Faisal",
-        Password: "Faisal@22",
-        License_info: "DL99887766",
-        Vehicle_ID: "VHL6005",
+        driverId: "DRV5005",
+        driverName: "Mohd Faisal",
+        password: "Faisal@22",
+        licenseInfo: "DL99887766",
+        vehicleId: "VHL6005",
         availability: false,
-        Rating: 4.6
+        rating: 4.6
     }
 ];
 
 const vehicles = [
     {
-        Vehicle_ID: "VHL6001",
-        Colour: "Red",
-        Plate_Number: "JKL 1234",
-        Type: "Proton Saga"
+        vehicleId: "VHL6001",                 
+        colour: "Red",                        
+        plateNumber: "JKL 1234",              
+        type: "Proton Saga"                   
     },
     {
-        Vehicle_ID: "VHL6002",
-        Colour: "Blue",
-        Plate_Number: "MEL 5678",
-        Type: "Perodua Myvi"
+        vehicleId: "VHL6002",
+        colour: "Blue",
+        plateNumber: "MEL 5678",
+        type: "Perodua Myvi"
     },
     {
-        Vehicle_ID: "VHL6003",
-        Colour: "Silver",
-        Plate_Number: "PNJ 9012",
-        Type: "Honda City"
+        vehicleId: "VHL6003",
+        colour: "Silver",
+        plateNumber: "PNJ 9012",
+        type: "Honda City"
     },
     {
-        Vehicle_ID: "VHL6004",
-        Colour: "Black",
-        Plate_Number: "KUL 3456",
-        Type: "Toyota Vios"
+        vehicleId: "VHL6004",
+        colour: "Black",
+        plateNumber: "KUL 3456",
+        type: "Toyota Vios"
     },
     {
-        Vehicle_ID: "VHL6005",
-        Colour: "White",
-        Plate_Number: "NSN 7890",
-        Type: "Proton X70"
+        vehicleId: "VHL6005",
+        colour: "White",
+        plateNumber: "NSN 7890",
+        type: "Proton X70"
     }
 ];
 
 const earnings = [
     {
-        Earning_ID: "ERN4001",
-        Driver_ID: "DRV5001",
-        Payments_ID: "PAY3001",
-        Total_Earn: 150.50,
-        This_Ride_Earning: 12.40,
-        Service_Fee: 3.10
+        earningId: "ERN4001",                
+        driverId: "DRV5001",                 
+        paymentId: "PAY3001",                
+        totalEarn: 150.50,                   
+        thisRideEarning: 12.40,              
+        serviceFee: 3.10                      
     },
     {
-        Earning_ID: "ERN4002",
-        Driver_ID: "DRV5002",
-        Payments_ID: "PAY3002",
-        Total_Earn: 220.00,
-        This_Ride_Earning: 9.60,
-        Service_Fee: 2.40
+        earningId: "ERN4002",
+        driverId: "DRV5002",
+        paymentId: "PAY3002",
+        totalEarn: 220.00,
+        thisRideEarning: 9.60,
+        serviceFee: 2.40
     },
     {
-        Earning_ID: "ERN4003",
-        Driver_ID: "DRV5003",
-        Payments_ID: "PAY3003",
-        Total_Earn: 95.25,
-        This_Ride_Earning: 16.00,
-        Service_Fee: 4.00
+        earningId: "ERN4003",
+        driverId: "DRV5003",
+        paymentId: "PAY3003",
+        totalEarn: 95.25,
+        thisRideEarning: 16.00,
+        serviceFee: 4.00
     },
     {
-        Earning_ID: "ERN4004",
-        Driver_ID: "DRV5001",
-        Payments_ID: "PAY3004",
-        Total_Earn: 180.75,
-        This_Ride_Earning: 15.00,
-        Service_Fee: 3.75
+        earningId: "ERN4004",
+        driverId: "DRV5001",
+        paymentId: "PAY3004",
+        totalEarn: 180.75,
+        thisRideEarning: 15.00,
+        serviceFee: 3.75
     },
     {
-        Earning_ID: "ERN4005",
-        Driver_ID: "DRV5004",
-        Payments_ID: "PAY3005",
-        Total_Earn: 310.00,
-        This_Ride_Earning: 0.00,
-        Service_Fee: 0.00
+        earningId: "ERN4005",
+        driverId: "DRV5004",
+        paymentId: "PAY3005",
+        totalEarn: 310.00,
+        thisRideEarning: 0.00,
+        serviceFee: 0.00
     }
 ];
 
 const admin = [
     {
-        Admin_ID: "ADM001",
-        Password: "Admin@123",
-        User_ID: ["USR1001", "USR1002", "USR1003", "USR1004", "USR1005"],
-        Rides_ID: ["RDE2001", "RDE2002", "RDE2003", "RDE2004", "RDE2005"],
-        Last_Login: new Date()
+        username: "admin",
+        adminId: "ADM001",                    
+        password: "Admin@123",                
+        userIds: ["USR1001", "USR1002", "USR1003", "USR1004", "USR1005"], 
+        rideIds: ["RDE2001", "RDE2002", "RDE2003", "RDE2004", "RDE2005"], 
+        lastLogin: new Date()                 
     }
 ];
-
 async function main() {
     const uri = "mongodb+srv://Database_Ass:Database_Ass2025@cluster0.i63ss4u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
     const client = new MongoClient(uri);
