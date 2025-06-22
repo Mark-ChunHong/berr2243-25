@@ -329,8 +329,8 @@ async function main() {
         for (const ride of rides) {
             const rideData = {
                 ...ride,
-                Start_Time: new Date(ride.Start_Time),
-                End_Time: new Date(ride.End_Time)
+                startTime: new Date(ride.startTime),
+                endTime: new Date(ride.endTime)
             };
             const result = await ridesCollection.insertOne(rideData);
             console.log(`New ride created with ID: ${result.insertedId}`);
@@ -340,7 +340,7 @@ async function main() {
         for (const payment of payments) {
             const paymentData = {
                 ...payment,
-                Transaction_Date: new Date(payment.Transaction_Date)
+                transactionDate: new Date(payment.transactionDate)
             };
             const result = await paymentsCollection.insertOne(paymentData);
             console.log(`New payment created with ID: ${result.insertedId}`);
