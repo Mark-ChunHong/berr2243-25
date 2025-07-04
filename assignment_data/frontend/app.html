@@ -1,0 +1,3656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyTaxi Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Added Inter font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* General Body Styles with Enhanced Background */
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            background-size: cover;
+            display: flex;
+            min-height: 100vh;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(255,255,255,0.1) 0%, transparent 50%);
+            animation: gradientShift 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { 
+                background: 
+                    radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 75% 75%, rgba(255,255,255,0.1) 0%, transparent 50%);
+            }
+            50% { 
+                background: 
+                    radial-gradient(circle at 75% 25%, rgba(255,255,255,0.15) 0%, transparent 50%),
+                    radial-gradient(circle at 25% 75%, rgba(255,255,255,0.15) 0%, transparent 50%);
+            }
+        }
+
+        /* Dashboard background when logged in */
+        body.dashboard-view {
+            background: #f0f2f5;
+            background-attachment: initial;
+        }
+
+        body.dashboard-view::before {
+            display: none;
+        }
+
+        /* Dashboard Container */
+        .dashboard-container {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            height: 95vh;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sidebar h3 {
+            margin-top: 0;
+            margin-bottom: 30px;
+            font-size: 1.5em;
+            color: #ecf0f1;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            width: 100%;
+        }
+
+        .sidebar ul li {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .sidebar ul li button {
+            background-color: #34495e;
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            text-align: left;
+            width: 100%;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            font-size: 1.05em;
+        }
+
+        .sidebar ul li button i {
+            margin-right: 10px;
+        }
+
+        .sidebar ul li button:hover {
+            background-color: #1abc9c;
+        }
+        .sidebar ul li button.active-btn {
+            background-color: #1abc9c;
+        }
+
+        /* Logout Button */
+        .logout-container {
+            margin-top: auto;
+            width: 100%;
+            padding-top: 20px;
+            border-top: 1px solid #4a657e;
+            text-align: center;
+        }
+        .logout-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 90%;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logout-btn:hover {
+            background-color: #c0392b;
+        }
+        .logout-btn i {
+            margin-right: 8px;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex-grow: 1;
+            padding: 30px;
+            background-color: #f0f2f5;
+            overflow-y: auto;
+        }
+
+        .main-content header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .main-content header h1 {
+            margin: 0;
+            color: #343a40;
+            font-size: 1.8em;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        .user-info .user-avatar {
+            width: 40px;
+            height: 40px;
+            background-color: #1abc9c;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+        .user-info .user-details {
+            color: #555;
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            text-align: right;
+        }
+        .user-info .user-details span {
+            font-size: 0.9em;
+        }
+        .user-info .user-details .user-name {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #343a40;
+        }
+
+        /* Section Styling */
+        .panel {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+        }
+        .panel h2 {
+            margin-top: 0;
+            color: #343a40;
+            font-size: 1.5em;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .panel h3 {
+            color: #343a40;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px dashed #eee;
+        }
+
+        /* Grid for Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card i {
+            font-size: 2.5em;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        .card h3 {
+            margin: 0 0 5px 0;
+            color: #343a40;
+            font-size: 1.2em;
+        }
+        .card p {
+            margin: 0;
+            color: #555;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table thead th {
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        table tbody td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #e9ecef;
+            color: #343a40;
+        }
+        table tbody tr:hover {
+            background-color: #f2f2f2;
+        }
+        table .action-buttons button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+            font-size: 0.85em;
+            transition: background-color 0.2s ease;
+        }
+        table .action-buttons button:hover {
+            background-color: #0056b3;
+        }
+        table .action-buttons button.delete-btn {
+            background-color: #dc3545;
+        }
+        table .action-buttons button.delete-btn:hover {
+            background-color: #c82333;
+        }
+        table .action-buttons button.view-btn {
+            background-color: #28a745;
+        }
+        table .action-buttons button.view-btn:hover {
+            background-color: #218838;
+        }
+        table .action-buttons button.action-btn {
+            background-color: #17a2b8;
+        }
+        table .action-buttons button.action-btn:hover {
+            background-color: #138496;
+        }
+        table .action-buttons button.complete-btn {
+            background-color: #28a745;
+        }
+        table .action-buttons button.complete-btn:hover {
+            background-color: #218838;
+        }
+
+        /* Toggle Availability Button Styles */
+        .toggle-availability-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 140px;
+            justify-content: center;
+        }
+
+        .toggle-availability-btn.btn-success {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .toggle-availability-btn.btn-success:hover {
+            background: linear-gradient(45deg, #218838, #1fa085);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .toggle-availability-btn.btn-warning {
+            background: linear-gradient(45deg, #ffc107, #ff8c00);
+            color: #212529;
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+        }
+
+        .toggle-availability-btn.btn-warning:hover {
+            background: linear-gradient(45deg, #e0a800, #e07b00);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
+        }
+
+        .toggle-availability-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .toggle-availability-btn i {
+            font-size: 16px;
+        }
+
+        /* Status Badge Styles */
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge.status-available {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-badge.status-unavailable {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Enhanced Admin Panel Styles */
+        .admin-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .admin-panel-header h2 {
+            margin: 0;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .admin-panel-header h2 i {
+            margin-right: 10px;
+            color: #007bff;
+        }
+
+        .admin-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .search-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-container i {
+            position: absolute;
+            left: 12px;
+            color: #6c757d;
+            z-index: 1;
+        }
+
+        .search-container input {
+            padding: 10px 15px 10px 35px;
+            border: 1px solid #ced4da;
+            border-radius: 20px;
+            width: 250px;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .search-container input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 123, 255, 0.3);
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+        }
+
+        .add-btn i {
+            margin-right: 8px;
+        }
+
+        /* Statistics Cards */
+        .drivers-stats, .rides-stats, .users-stats, .vehicles-stats, .payments-stats, .earnings-stats, .driver-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s ease;
+            border-left: 4px solid #007bff;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .stat-card:nth-child(2) {
+            border-left-color: #28a745;
+        }
+
+        .stat-card:nth-child(3) {
+            border-left-color: #dc3545;
+        }
+
+        .stat-card:nth-child(4) {
+            border-left-color: #ffc107;
+        }
+
+        .stat-card i {
+            font-size: 2.5em;
+            margin-right: 15px;
+            color: #007bff;
+        }
+
+        .stat-card:nth-child(2) i {
+            color: #28a745;
+        }
+
+        .stat-card:nth-child(3) i {
+            color: #dc3545;
+        }
+
+        .stat-card:nth-child(4) i {
+            color: #ffc107;
+        }
+
+        .stat-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: 700;
+            color: #2c3e50;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #6c757d;
+            font-weight: 500;
+            margin-top: 5px;
+        }
+
+        /* Enhanced Form Styles */
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .form-header h3 {
+            margin: 0;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .form-header h3 i {
+            margin-right: 10px;
+            color: #007bff;
+        }
+
+        .close-form-btn {
+            background: none;
+            border: none;
+            color: #6c757d;
+            font-size: 1.2em;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .close-form-btn:hover {
+            background-color: #f8f9fa;
+            color: #dc3545;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .form-section h4 {
+            margin: 0 0 15px 0;
+            color: #495057;
+            font-weight: 600;
+            font-size: 1.1em;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #007bff;
+        }
+
+        .input-with-symbol {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .currency-symbol {
+            position: absolute;
+            left: 12px;
+            color: #6c757d;
+            font-weight: 600;
+            z-index: 1;
+        }
+
+        .input-with-symbol input {
+            padding-left: 30px;
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 5px;
+            color: #6c757d;
+            font-size: 0.85em;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(40, 167, 69, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        .submit-btn i {
+            margin-right: 8px;
+        }
+
+        /* Enhanced Table Styles */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .table-header h3 {
+            margin: 0;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .table-filters {
+            display: flex;
+            gap: 10px;
+        }
+
+        .table-filters select {
+            padding: 8px 15px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            background: white;
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .modern-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+        }
+
+        .modern-table thead th {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .modern-table tbody td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #e9ecef;
+            color: #495057;
+            vertical-align: middle;
+        }
+
+        .modern-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .modern-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: capitalize;
+            display: inline-block;
+        }
+
+        .status-available {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-unavailable {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .status-accepted {
+            background-color: #cce5ff;
+            color: #004085;
+            border: 1px solid #b8daff;
+        }
+
+        .status-in-progress {
+            background-color: #e2e3e5;
+            color: #383d41;
+            border: 1px solid #d6d8db;
+        }
+
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Contact Info and Trip Details */
+        .contact-info, .trip-details {
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .contact-info div, .trip-details div {
+            margin-bottom: 2px;
+        }
+
+        .contact-info div:last-child, .trip-details div:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .admin-panel-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .admin-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .search-container input {
+                width: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .drivers-stats, .rides-stats, .users-stats, .vehicles-stats, .payments-stats, .earnings-stats, .driver-stats, .passenger-stats, .passenger-rides-stats, .driver-earnings-stats, .driver-rides-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .search-container input {
+                width: 150px;
+            }
+
+            .table-filters {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .drivers-stats, .rides-stats, .users-stats, .vehicles-stats, .payments-stats, .earnings-stats, .driver-stats, .passenger-stats, .passenger-rides-stats, .driver-earnings-stats, .driver-rides-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .search-container input {
+                width: 100%;
+            }
+        }
+
+
+        /* Forms in panels */
+        .form-container {
+            margin-top: 20px;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        .form-container .form-group {
+            margin-bottom: 15px;
+        }
+        .form-container label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #343a40;
+        }
+        .form-container input[type="text"],
+        .form-container input[type="email"],
+        .form-container input[type="password"],
+        .form-container input[type="tel"],
+        .form-container input[type="number"],
+        .form-container select,
+        .form-container textarea {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+        .form-container button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+        .form-container button:hover {
+            background-color: #0056b3;
+        }
+        .form-container .message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            display: block;
+        }
+        .form-container .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .form-container .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .form-container .message.info-message, .message.info-message {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            padding: 15px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            margin: 10px 0;
+        }
+
+        .profile-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 6px;
+        }
+        .profile-info div strong {
+            display: block;
+            color: #343a40;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        .profile-info div span {
+            color: #555;
+            font-weight: normal;
+        }
+        .form-actions {
+            margin-top: 20px;
+            text-align: right;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        .form-actions button.cancel-btn {
+            background-color: #6c757d;
+        }
+        .form-actions button.cancel-btn:hover {
+            background-color: #5a6268;
+        }
+
+        .delete-btn {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(220, 53, 69, 0.3);
+        }
+
+        .delete-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+            background: linear-gradient(135deg, #c82333, #a02129);
+        }
+
+        .delete-btn i {
+            margin-right: 8px;
+        }
+
+        /* --- Enhanced Login Page Styles --- */
+        .login-container {
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+            padding: 50px 40px;
+            border-radius: 20px;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.1),
+                0 8px 16px rgba(0, 0, 0, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #1abc9c 100%);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .login-container::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(102,126,234,0.03) 0%, transparent 50%);
+            pointer-events: none;
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .login-container h2 {
+            margin-bottom: 40px;
+            color: #2c3e50;
+            font-size: 2.5em;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Enhanced Form Group Styling */
+        .login-container .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-container .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 0.95em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .login-container .form-group label i {
+            color: #667eea;
+            width: 16px;
+            text-align: center;
+        }
+
+        .login-container .form-group label::before {
+            display: none; /* Remove the dot since we're using icons */
+        }
+
+        .login-container .form-group input[type="email"],
+        .login-container .form-group input[type="password"],
+        .login-container .form-group select {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1em;
+            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            position: relative;
+        }
+
+        .login-container .form-group input[type="email"]::placeholder,
+        .login-container .form-group input[type="password"]::placeholder {
+            color: #a0aec0;
+            font-style: italic;
+        }
+
+        .login-container .form-group input[type="email"]:focus,
+        .login-container .form-group input[type="password"]:focus,
+        .login-container .form-group select:focus {
+            border-color: #667eea;
+            box-shadow: 
+                0 0 0 3px rgba(102, 126, 234, 0.1),
+                0 4px 12px rgba(102, 126, 234, 0.15);
+            transform: translateY(-1px);
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .login-container .form-group select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%23667eea" d="M2 0L0 2h4L2 0zM2 5L0 3h4L2 5z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 12px;
+            padding-right: 45px;
+        }
+
+        /* Enhanced Login Button */
+        .login-container .login-btn {
+            width: 100%;
+            padding: 18px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 25px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .login-container .login-btn i {
+            font-size: 1.1em;
+            transition: transform 0.3s ease;
+        }
+
+        .login-container .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .login-container .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 25px rgba(102, 126, 234, 0.3),
+                0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .login-container .login-btn:hover i {
+            transform: translateX(2px);
+        }
+
+        .login-container .login-btn:hover::before {
+            left: 100%;
+        }
+
+        .login-container .login-btn:active {
+            transform: translateY(0);
+            transition: transform 0.1s;
+        }
+
+        /* Enhanced Message Styling */
+        .login-container .message {
+            margin-top: 25px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            display: none;
+            position: relative;
+            z-index: 1;
+            font-weight: 500;
+            animation: slideInUp 0.3s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-container .message.success {
+            background: linear-gradient(135deg, #d4edda 0%, #e8f5e9 100%);
+            color: #2e7d32;
+            border: 2px solid #81c784;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+        }
+
+        .login-container .message.error {
+            background: linear-gradient(135deg, #f8d7da 0%, #ffebee 100%);
+            color: #c62828;
+            border: 2px solid #ef5350;
+            box-shadow: 0 4px 12px rgba(244, 67, 54, 0.2);
+        }
+        /* Enhanced Register Link */
+        .register-link {
+            margin-top: 30px;
+            font-size: 0.95em;
+            position: relative;
+            z-index: 1;
+            padding: 16px;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            color: #4a5568;
+        }
+
+        .register-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .register-link a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+
+        .register-link a:hover {
+            color: #764ba2;
+            transform: translateY(-1px);
+        }
+
+        .register-link a:hover::after {
+            width: 100%;
+        }
+
+        /* Responsive Design for Login */
+        @media (max-width: 768px) {
+            .login-container {
+                padding: 40px 30px;
+                margin: 20px;
+                max-width: calc(100vw - 40px);
+            }
+
+            .login-container h2 {
+                font-size: 2.2em;
+            }
+
+            .login-container .form-group input[type="email"],
+            .login-container .form-group input[type="password"],
+            .login-container .form-group select {
+                padding: 14px 18px;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+
+            .login-container .login-btn {
+                padding: 16px 20px;
+                font-size: 1em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 25px;
+                margin: 15px;
+                border-radius: 16px;
+            }
+
+            .login-container h2 {
+                font-size: 2em;
+                margin-bottom: 30px;
+            }
+        }
+
+        /* Loading state for login button */
+        .login-container .login-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .login-container .login-btn.loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Floating animation for login container */
+        .login-container {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* Modal for Registration */
+        .modal {
+            display: flex;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+            animation-name: animatetop;
+            animation-duration: 0.4s
+        }
+        
+        /* Modal-specific styles for ride details */
+        .modal-content .details-section {
+            margin-bottom: 20px;
+        }
+        .modal-content .details-section h3 {
+            font-size: 1.3em;
+            color: #343a40;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .modal-content .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+         .modal-content .details-grid p {
+            margin: 5px 0;
+         }
+        .modal-content .details-grid strong {
+            color: #555;
+        }
+
+
+        /* Add Animation */
+        @keyframes animatetop {
+            from {top: -300px; opacity: 0}
+            to {top: 0; opacity: 1}
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .modal-content .form-group {
+            margin-bottom: 15px;
+        }
+        .modal-content input[type="text"],
+        .modal-content input[type="email"],
+        .modal-content input[type="password"],
+        .modal-content input[type="tel"],
+        .modal-content input[type="number"],
+        .modal-content select {
+            width: calc(100% - 20px);
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .modal-content button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 15px;
+        }
+        .modal-content button:hover {
+            background-color: #218838;
+        }
+        .hidden {
+            display: none !important;
+        }
+
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+                height: auto;
+            }
+            .sidebar {
+                width: 100%;
+                padding: 15px;
+                flex-direction: row;
+                justify-content: space-around;
+                align-items: flex-start;
+                flex-wrap: wrap;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .sidebar h3 {
+                display: none;
+            }
+            .sidebar ul {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                margin-bottom: 10px;
+            }
+            .sidebar ul li {
+                margin-bottom: 5px;
+                margin-right: 8px;
+                flex-basis: auto;
+            }
+            .sidebar ul li:last-child {
+                margin-right: 0;
+            }
+            .sidebar ul li button {
+                padding: 8px 10px;
+                font-size: 0.9em;
+            }
+            .sidebar ul li button i {
+                margin-right: 5px;
+            }
+            .logout-container {
+                margin-top: 10px;
+                padding-top: 10px;
+                width: 100%;
+            }
+            .logout-btn {
+                width: calc(100% - 20px);
+                font-size: 0.9em;
+                padding: 8px 15px;
+            }
+            .main-content {
+                padding: 20px;
+            }
+            .main-content header {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+            .main-content header h1 {
+                margin-bottom: 10px;
+                font-size: 1.5em;
+            }
+            .user-info {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+            .profile-info {
+                grid-template-columns: 1fr;
+            }
+            .form-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .form-actions button {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .modal-content .details-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Passenger-specific Styles */
+        .passenger-stats, .passenger-rides-stats, .driver-earnings-stats, .driver-rides-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        /* Profile Overview Card */
+        .profile-overview-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .profile-avatar {
+            flex-shrink: 0;
+        }
+
+        .avatar-circle {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2em;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .profile-info-display {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .profile-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+        }
+
+        .detail-item i {
+            color: #007bff;
+            width: 20px;
+            text-align: center;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #6c757d;
+            min-width: 80px;
+        }
+
+        .detail-value {
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        /* Form Card Styling - Enhanced */
+        .form-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-top: 25px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .form-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Form Header Enhancement */
+        .form-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .form-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.1;
+        }
+
+        .form-header h3 {
+            margin: 0;
+            font-size: 1.4em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-header h3 i {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .close-form-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .close-form-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        /* Form Grid Enhancement */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .form-section {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .form-section:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-section h4 {
+            margin: 0 0 20px 0;
+            color: #2c3e50;
+            font-size: 1.2em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+        }
+
+        .form-section h4::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+        }
+
+        /* Enhanced Form Groups */
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e;
+            font-weight: 500;
+            font-size: 0.95em;
+            transition: color 0.3s ease;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .form-group input:hover,
+        .form-group select:hover {
+            border-color: #bdc3c7;
+        }
+
+        /* Location Input Enhancement */
+        .location-input-wrapper {
+            position: relative;
+        }
+
+        .location-input-wrapper::before {
+            content: '📍';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1;
+            font-size: 1.1em;
+        }
+
+        .location-input-wrapper input {
+            padding-left: 45px;
+        }
+
+        /* Enhanced Form Actions */
+        .form-actions {
+            margin-top: 25px;
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Payment Method Select Enhancement */
+        .payment-select-wrapper {
+            position: relative;
+        }
+
+        .payment-select-wrapper::before {
+            content: '💳';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1;
+            font-size: 1.1em;
+        }
+
+        .payment-select-wrapper select {
+            padding-left: 45px;
+            appearance: none;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23667eea" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"></polyline></svg>');
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+        }
+
+        /* Passenger Count Enhancement */
+        .passenger-count-wrapper {
+            position: relative;
+        }
+
+        .passenger-count-wrapper::before {
+            content: '👥';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1;
+            font-size: 1.1em;
+        }
+
+        .passenger-count-wrapper input {
+            padding-left: 45px;
+        }
+
+        /* Form Text Enhancement */
+        .form-text {
+            font-size: 0.85em;
+            color: #7f8c8d;
+            margin-top: 6px;
+            font-style: italic;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .form-text::before {
+            content: 'ℹ️';
+            font-size: 0.9em;
+        }
+
+        /* Enhanced Request Button */
+        .enhanced-request-btn {
+            background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(26, 188, 156, 0.3);
+            text-transform: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .enhanced-request-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .enhanced-request-btn:hover::before {
+            left: 100%;
+        }
+
+        .enhanced-request-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26, 188, 156, 0.4);
+            background: linear-gradient(135deg, #1abc9c 0%, #17b794 100%);
+        }
+
+        .enhanced-request-btn:active {
+            transform: translateY(0);
+        }
+
+        .enhanced-request-btn i {
+            font-size: 1.1em;
+        }
+
+        /* Profile Overview Card Enhancement */
+        .profile-overview-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-overview-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="rgba(102,126,234,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23dots)"/></svg>');
+            pointer-events: none;
+        }
+
+        .profile-overview-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .profile-avatar {
+            position: relative;
+            z-index: 1;
+        }
+
+        .avatar-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2em;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .profile-overview-card:hover .avatar-circle {
+            transform: scale(1.05);
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .profile-info-display {
+            position: relative;
+            z-index: 1;
+        }
+
+        .profile-name {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-item i {
+            color: #667eea;
+            width: 20px;
+            text-align: center;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: #7f8c8d;
+            min-width: 80px;
+        }
+
+        .detail-value {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        /* Loading Animation for Forms */
+        .submit-btn.loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .submit-btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            margin: auto;
+            border: 2px solid transparent;
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+            20%, 40%, 60%, 80% { transform: translateX(2px); }
+        }
+
+        /* Responsive Design for Forms */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .form-section {
+                padding: 20px;
+            }
+            
+            .form-header {
+                padding: 15px 20px;
+            }
+            
+            .form-header h3 {
+                font-size: 1.2em;
+            }
+
+            .profile-overview-card {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+
+            .profile-details {
+                grid-template-columns: 1fr;
+            }
+
+            .enhanced-request-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .avatar-circle {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5em;
+            }
+        }
+
+        /* Payment Method Badges */
+        .payment-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: capitalize;
+            display: inline-block;
+        }
+
+        .payment-badge.cash {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .payment-badge.credit-card {
+            background-color: #cce5ff;
+            color: #004085;
+            border: 1px solid #b8daff;
+        }
+
+        .payment-badge.debit-card {
+            background-color: #e2e3e5;
+            color: #383d41;
+            border: 1px solid #d6d8db;
+        }
+
+        .payment-badge.digital-wallet {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .payment-badge.bank-transfer {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Enhanced form styling */
+        .form-text {
+            font-size: 0.8em;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .profile-overview-card {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+
+            .profile-details {
+                grid-template-columns: 1fr;
+            }
+
+            .passenger-stats, .passenger-rides-stats, .driver-earnings-stats, .driver-rides-stats {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loginContainer" class="login-container">
+        <h2>Login to MyTaxi</h2>
+        <div id="loginMessage" class="message"></div>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="roleSelect"><i class="fas fa-user-tag"></i> Login As:</label>
+                <select id="roleSelect" name="role" required>
+                    <option value="user">🚗 Passenger</option>
+                    <option value="driver">🚕 Driver</option>
+                    <option value="admin">👨‍💼 Admin</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="email"><i class="fas fa-envelope"></i> Email:</label>
+                <input type="email" id="email" name="email" required autocomplete="username" placeholder="Enter your email address">
+            </div>
+            <div class="form-group">
+                <label for="password"><i class="fas fa-lock"></i> Password:</label>
+                <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="Enter your password">
+            </div>
+            <button type="submit" class="login-btn">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+        </form>
+        <div class="register-link">
+            Don't have an account? <a href="#" id="openRegisterModal">Register here</a>
+        </div>
+        
+        <!-- DEBUG TEST BUTTONS FOR 403 ERROR -->
+        <div id="debugTestButtons" style="margin-top: 20px; padding: 10px; background-color: #f0f0f0; border-radius: 5px; display: none;">
+            <h4>DEBUG: Test 403 Error (for developers)</h4>
+            <button type="button" onclick="test403Error()" style="background-color: #dc3545; color: white; padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer;">Test Admin Access (403)</button>
+            <button type="button" onclick="testDriverForbidden()" style="background-color: #dc3545; color: white; padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer; margin-left: 10px;">Test Driver Access (403)</button>
+        </div>
+    </div>
+
+    <div id="registerModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Register New Account</h2>
+            <div id="registerMessage" class="message"></div>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="regRole">Register As:</label>
+                    <select id="regRole" name="regRole" required>
+                        <option value="user">Passenger</option>
+                        <option value="driver">Driver</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="regName">Name:</label>
+                    <input type="text" id="regName" name="regName" required>
+                </div>
+                <div class="form-group">
+                    <label for="regEmail">Email:</label>
+                    <input type="email" id="regEmail" name="regEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="regPhone">Phone:</label>
+                    <input type="tel" id="regPhone" name="regPhone" pattern="[0-9]{10,}" title="Phone number must be at least 10 digits" required>
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Password:</label>
+                    <input type="password" id="regPassword" name="regPassword" required>
+                </div>
+                <div class="form-group driver-fields hidden">
+                    <label for="regLicenseNumber">License Number:</label>
+                    <input type="text" id="regLicenseNumber" name="licenseNumber">
+                </div>
+                <div class="form-group driver-fields hidden">
+                    <label for="regVehicleDetails">Vehicle Details (e.g., Car Model, Plate No.):</label>
+                    <input type="text" id="regVehicleDetails" name="vehicleDetails">
+                </div>
+                <button type="submit">Register</button>
+            </form>
+        </div>
+    </div>
+    
+    <div id="acceptRideModal" class="modal hidden">
+        <div class="modal-content">
+            <span id="closeAcceptRideModal" class="close-button">&times;</span>
+            <h2>Accept Ride</h2>
+            <div id="acceptRideMessage" class="message hidden"></div>
+            <form id="acceptRideForm">
+                 <p>Please set the fare for this ride and confirm.</p>
+                <div class="form-group">
+                    <label for="rideFareInput">Fare (RM):</label>
+                    <input type="number" id="rideFareInput" name="fare" step="0.01" min="0" required>
+                </div>            <div class="form-actions">
+                <button type="button" id="confirmAcceptRideBtn">Confirm & Accept Ride</button>
+                <button type="button" class="cancel-btn" id="cancelAcceptRideBtn">Cancel</button>
+            </div>
+        </form>
+        </div>
+    </div>
+
+    <div id="rideDetailsModal" class="modal hidden">
+        <div class="modal-content">
+            <span id="closeRideDetailsModal" class="close-button">&times;</span>
+            <h2>Ride Details</h2>
+
+            <div class="details-section">
+                <h3>Ride Information</h3>
+                <div class="details-grid">
+                    <p><strong>Ride ID:</strong> <span id="detailsRideId"></span></p>
+                    <p><strong>Status:</strong> <span id="detailsRideStatus"></span></p>
+                    <p><strong>Date:</strong> <span id="detailsRideDate"></span></p>
+                    <p><strong>Fare:</strong> <span id="detailsRideFare"></span></p>
+                    <p><strong>Payment Method:</strong> <span id="detailsRidePaymentMethod"></span></p>
+                    <p><strong>Pickup:</strong> <span id="detailsRidePickup"></span></p>
+                    <p><strong>Dropoff:</strong> <span id="detailsRideDropoff"></span></p>
+                </div>
+            </div>
+
+            <div id="rideDriverVehicleInfo" class="hidden">
+                <div class="details-section">
+                    <h3>Driver Information</h3>
+                    <div class="details-grid">
+                        <p><strong>Name:</strong> <span id="detailsDriverName"></span></p>
+                        <p><strong>Phone:</strong> <span id="detailsDriverPhone"></span></p>
+                    </div>
+                </div>
+
+                <div class="details-section">
+                    <h3>Vehicle Information</h3>
+                    <div class="details-grid">
+                        <p><strong>Make:</strong> <span id="detailsVehicleMake"></span></p>
+                        <p><strong>Model:</strong> <span id="detailsVehicleModel"></span></p>
+                        <p><strong>License Plate:</strong> <span id="detailsVehicleLicensePlate"></span></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="rideNoDriverInfo" class="message hidden">
+                Driver and vehicle details will be available once a driver accepts the ride.
+            </div>
+        </div>
+    </div>
+
+
+    <div id="dashboardWrapper" class="dashboard-container hidden">
+        <aside class="sidebar">
+            <h3>MyTaxi Dashboard</h3>
+            <ul id="adminSidebar" class="hidden">
+                <li><button class="active-btn sidebar-button" id="adminDashboardBtn"><i class="fas fa-chart-line"></i> Dashboard</button></li>
+                <li><button class="sidebar-button" id="adminUsersBtn"><i class="fas fa-users"></i> Users</button></li>
+                <li><button class="sidebar-button" id="adminDriversBtn"><i class="fas fa-taxi"></i> Drivers</button></li>
+                <li><button class="sidebar-button" id="adminVehiclesBtn"><i class="fas fa-car"></i> Vehicles</button></li>
+                <li><button class="sidebar-button" id="adminRidesBtn"><i class="fas fa-route"></i> Rides</button></li>
+                <li><button class="sidebar-button" id="adminPaymentsBtn"><i class="fas fa-dollar-sign"></i> Payments</button></li>
+                <li><button class="sidebar-button" id="adminEarningsBtn"><i class="fas fa-money-bill-wave"></i> Earnings</button></li>
+                <li><button class="sidebar-button" id="adminProfileBtn"><i class="fas fa-user-cog"></i> My Profile</button></li>
+            </ul>
+            <ul id="driverSidebar" class="hidden">
+                <li><button class="active-btn sidebar-button" id="driverDashboardBtn"><i class="fas fa-chart-line"></i> Dashboard</button></li>
+                <li><button class="sidebar-button" id="driverRidesBtn"><i class="fas fa-route"></i> My Rides</button></li>
+                <li><button class="sidebar-button" id="driverEarningsBtn"><i class="fas fa-money-bill-wave"></i> Earnings</button></li>
+                <li><button class="sidebar-button" id="driverProfileBtn"><i class="fas fa-user"></i> My Profile</button></li>
+            </ul>
+            <ul id="passengerSidebar" class="hidden">
+                <li><button class="active-btn sidebar-button" id="passengerDashboardBtn"><i class="fas fa-chart-line"></i> Dashboard</button></li>
+                <li><button class="sidebar-button" id="passengerRidesBtn"><i class="fas fa-route"></i> My Rides</button></li>
+                <li><button class="sidebar-button" id="passengerProfileBtn"><i class="fas fa-user"></i> My Profile</button></li>
+            </ul>
+
+            <div class="logout-container">
+                <button id="logout-btn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <h1 id="current-tab">Dashboard</h1>
+                <div class="user-info">
+                    <div class="user-avatar" id="user-initials">US</div>
+                    <div class="user-details">
+                        <span id="user-display-name">User Name</span>
+                        <span id="user-email-display">user@example.com</span>
+                        <span id="user-role-display">Role</span>
+                    </div>
+                </div>
+            </header>
+
+            <div id="adminPanels" class="panel-group hidden">
+                <section id="adminDashboardPanel" class="panel">
+                    <h2>Admin Dashboard Overview</h2>
+                    <div class="card-grid">
+                        <div class="card">
+                            <i class="fas fa-users"></i>
+                            <h3>Total Users</h3>
+                            <p id="total-users">0</p>
+                        </div>
+                        <div class="card">
+                            <i class="fas fa-taxi"></i>
+                            <h3>Total Drivers</h3>
+                            <p id="total-drivers">0</p>
+                        </div>
+                        <div class="card">
+                            <i class="fas fa-route"></i>
+                            <h3>Total Rides</h3>
+                            <p id="total-rides">0</p>
+                        </div>
+                        <div class="card">
+                            <i class="fas fa-dollar-sign"></i>
+                            <h3>Total Earnings</h3>
+                            <p id="total-earnings">RM0.00</p>
+                        </div>
+                    </div>
+                    <h3>Recent Rides</h3>
+                    <table id="recent-rides">
+                        <thead>
+                            <tr>
+                                <th>Ride ID</th>
+                                <th>Passenger</th>
+                                <th>Driver</th>
+                                <th>Pickup</th>
+                                <th>Dropoff</th>
+                                <th>Status</th>
+                                <th>Fare</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </section>
+
+                <section id="adminUsersPanel" class="panel hidden">
+                    <div class="admin-panel-header">
+                        <h2><i class="fas fa-users"></i> Manage Passengers</h2>
+                        <div class="admin-actions">
+                            <button class="add-btn" onclick="showAddUserForm()">
+                                <i class="fas fa-plus"></i> Add New Passenger
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="addUserForm" class="form-container hidden">
+                        <div class="form-header">
+                            <h3><i class="fas fa-user-plus"></i> Add New Passenger</h3>
+                            <button type="button" class="close-form-btn" onclick="hideAddUserForm()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div id="addUserMessage" class="message hidden"></div>
+                        
+                        <div class="form-grid">
+                            <div class="form-section">
+                                <h4>Personal Information</h4>
+                                <div class="form-group">
+                                    <label for="newUserId">User ID:</label>
+                                    <input type="text" id="newUserId" placeholder="USRXXX" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newUserName">Full Name:</label>
+                                    <input type="text" id="newUserName" placeholder="Enter passenger's full name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newUserEmail">Email Address:</label>
+                                    <input type="email" id="newUserEmail" placeholder="passenger@example.com" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newUserPhone">Phone Number:</label>
+                                    <input type="tel" id="newUserPhone" pattern="[0-9]{10,}" placeholder="1234567890" title="Phone number must be at least 10 digits" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newUserPassword">Password:</label>
+                                    <input type="password" id="newUserPassword" placeholder="Enter secure password" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="submit-btn" onclick="addUser()">
+                                <i class="fas fa-save"></i> Add Passenger
+                            </button>
+                            <button type="button" class="cancel-btn" onclick="hideAddUserForm()">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="users-stats">
+                        <div class="stat-card">
+                            <i class="fas fa-users"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="totalUsersCount">0</span>
+                                <span class="stat-label">Total Passengers</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-calendar-check"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="activeUsersCount">0</span>
+                                <span class="stat-label">Active This Month</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-user-plus"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="newUsersCount">0</span>
+                                <span class="stat-label">New This Week</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3>All Passengers</h3>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table id="users-table" class="modern-table">
+                                <thead>
+                                    <tr>
+                                        <th>User ID</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Registration Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="adminDriversPanel" class="panel hidden">
+                    <div class="admin-panel-header">
+                        <h2><i class="fas fa-taxi"></i> Manage Drivers</h2>
+                        <div class="admin-actions">
+                            <button class="add-btn" onclick="showAddDriverForm()">
+                                <i class="fas fa-plus"></i> Add New Driver
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="addDriverForm" class="form-container hidden">
+                        <div class="form-header">
+                            <h3><i class="fas fa-user-plus"></i> Add New Driver</h3>
+                            <button type="button" class="close-form-btn" onclick="hideAddDriverForm()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div id="addDriverMessage" class="message hidden"></div>
+                        
+                        <div class="form-grid">
+                            <div class="form-section">
+                                <h4>Personal Information</h4>
+                                <div class="form-group">
+                                    <label for="newDriverId">Driver ID:</label>
+                                    <input type="text" id="newDriverId" placeholder="DRVXXX" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newDriverName">Full Name:</label>
+                                    <input type="text" id="newDriverName" placeholder="Enter driver's full name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newDriverEmail">Email Address:</label>
+                                    <input type="email" id="newDriverEmail" placeholder="driver@example.com" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newDriverPhone">Phone Number:</label>
+                                    <input type="tel" id="newDriverPhone" pattern="[0-9]{10,}" placeholder="1234567890" title="Phone number must be at least 10 digits" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newDriverPassword">Password:</label>
+                                    <input type="password" id="newDriverPassword" placeholder="Enter secure password" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-section">
+                                <h4>Professional Details</h4>
+                                <div class="form-group">
+                                    <label for="newDriverLicense">License Number:</label>
+                                    <input type="text" id="newDriverLicense" placeholder="Driver's license number" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newDriverVehicleDetails">Vehicle Details:</label>
+                                    <input type="text" id="newDriverVehicleDetails" placeholder="e.g., Toyota Camry, ABC1234" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newDriverAvailability">Initial Status:</label>
+                                    <select id="newDriverAvailability" required>
+                                        <option value="true">Available</option>
+                                        <option value="false">Unavailable</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="submit-btn" onclick="addDriver()">
+                                <i class="fas fa-save"></i> Add Driver
+                            </button>
+                            <button type="button" class="cancel-btn" onclick="hideAddDriverForm()">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="drivers-stats">
+                        <div class="stat-card">
+                            <i class="fas fa-users"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="totalDriversCount">0</span>
+                                <span class="stat-label">Total Drivers</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-check-circle"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="availableDriversCount">0</span>
+                                <span class="stat-label">Available</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-pause-circle"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="unavailableDriversCount">0</span>
+                                <span class="stat-label">Unavailable</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3>All Drivers</h3>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table id="drivers-table" class="modern-table">
+                                <thead>
+                                    <tr>
+                                        <th>Driver ID</th>
+                                        <th>Name</th>
+                                        <th>Contact Info</th>
+                                        <th>License</th>
+                                        <th>Vehicle</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="adminVehiclesPanel" class="panel hidden">
+                    <div class="admin-panel-header">
+                        <h2><i class="fas fa-car"></i> Manage Vehicles</h2>
+                        <div class="admin-actions">
+                            <button class="add-btn" onclick="showAddVehicleForm()">
+                                <i class="fas fa-plus"></i> Add New Vehicle
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="addVehicleForm" class="form-container hidden">
+                        <div class="form-header">
+                            <h3><i class="fas fa-car"></i> Add New Vehicle</h3>
+                            <button type="button" class="close-form-btn" onclick="hideAddVehicleForm()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div id="addVehicleMessage" class="message hidden"></div>
+                        
+                        <div class="form-grid">
+                            <div class="form-section">
+                                <h4>Vehicle Information</h4>
+                                <div class="form-group">
+                                    <label for="newVehicleId">Vehicle ID:</label>
+                                    <input type="text" id="newVehicleId" placeholder="VHLXXX" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newVehicleMake">Make:</label>
+                                    <input type="text" id="newVehicleMake" placeholder="e.g., Toyota, Honda" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newVehicleModel">Model:</label>
+                                    <input type="text" id="newVehicleModel" placeholder="e.g., Camry, Civic" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newVehicleYear">Year:</label>
+                                    <input type="number" id="newVehicleYear" min="1900" max="2100" placeholder="2020" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newVehicleLicensePlate">License Plate:</label>
+                                    <input type="text" id="newVehicleLicensePlate" placeholder="ABC-1234" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newVehicleDriverId">Assigned Driver ID (Optional):</label>
+                                    <input type="text" id="newVehicleDriverId" placeholder="e.g., DRV5001">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="submit-btn" onclick="addVehicle()">
+                                <i class="fas fa-save"></i> Add Vehicle
+                            </button>
+                            <button type="button" class="cancel-btn" onclick="hideAddVehicleForm()">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="vehicles-stats">
+                        <div class="stat-card">
+                            <i class="fas fa-car"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="totalVehiclesCount">0</span>
+                                <span class="stat-label">Total Vehicles</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-check-circle"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="assignedVehiclesCount">0</span>
+                                <span class="stat-label">Assigned</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-pause-circle"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="unassignedVehiclesCount">0</span>
+                                <span class="stat-label">Unassigned</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3>All Vehicles</h3>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table id="vehicles-table" class="modern-table">
+                                <thead>
+                                    <tr>
+                                        <th>Vehicle ID</th>
+                                        <th>Vehicle Dateils</th>
+                                        <th>License Plate</th>
+                                        <th>Assigned Driver</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="adminRidesPanel" class="panel hidden">
+                    <div class="admin-panel-header">
+                        <h2><i class="fas fa-route"></i> Manage Rides</h2>
+                        <div class="admin-actions">
+                            <button class="add-btn" onclick="showAddRideForm()">
+                                <i class="fas fa-plus"></i> Add New Ride
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="addRideForm" class="form-container hidden">
+                        <div class="form-header">
+                            <h3><i class="fas fa-plus-circle"></i> Create New Ride</h3>
+                            <button type="button" class="close-form-btn" onclick="hideAddRideForm()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div id="addRideMessage" class="message hidden"></div>
+                        
+                        <div class="form-grid">
+                            <div class="form-section">
+                                <h4>Ride Information</h4>
+                                <div class="form-group">
+                                    <label for="newRideId">Ride ID:</label>
+                                    <input type="text" id="newRideId" placeholder="RDEXXX" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newRideUserId">Passenger ID:</label>
+                                    <input type="text" id="newRideUserId" placeholder="USRXXX" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newRideDriverId">Driver ID:</label>
+                                    <input type="text" id="newRideDriverId" placeholder="DRVXXX" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newRideVehicleId">Vehicle ID (Optional):</label>
+                                    <input type="text" id="newRideVehicleId" placeholder="VHLXXX">
+                                </div>
+                            </div>
+                            
+                            <div class="form-section">
+                                <h4>Trip Details</h4>
+                                <div class="form-group">
+                                    <label for="newRidePickup">Pickup Location:</label>
+                                    <input type="text" id="newRidePickup" placeholder="Enter pickup address" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newRideDropoff">Dropoff Location:</label>
+                                    <input type="text" id="newRideDropoff" placeholder="Enter destination address" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newRideFare">Fare Amount:</label>
+                                    <div class="input-with-symbol">
+                                        <span class="currency-symbol">$</span>
+                                        <input type="number" id="newRideFare" step="0.01" min="0" placeholder="0.00" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newRideStatus">Initial Status:</label>
+                                    <select id="newRideStatus" required>
+                                        <option value="pending">Pending</option>
+                                        <option value="accepted">Accepted</option>
+                                        <option value="in_progress">In Progress</option>
+                                        <option value="completed">Completed</option>
+                                        <option value="cancelled">Cancelled</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newRidePaymentMethod">Payment Method:</label>
+                                    <select id="newRidePaymentMethod">
+                                        <option value="">Select payment method (Optional)</option>
+                                        <option value="cash">Cash</option>
+                                        <option value="credit_card">Credit Card</option>
+                                        <option value="debit_card">Debit Card</option>
+                                        <option value="digital_wallet">Digital Wallet (GrabPay, TouchNGo)</option>
+                                        <option value="bank_transfer">Online Banking</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newRideDate">Ride Date & Time:</label>
+                                    <input type="datetime-local" id="newRideDate">
+                                    <small>Leave empty to use current date/time</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="submit-btn" onclick="addRide()">
+                                <i class="fas fa-save"></i> Create Ride
+                            </button>
+                            <button type="button" class="cancel-btn" onclick="hideAddRideForm()">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="rides-stats">
+                        <div class="stat-card">
+                            <i class="fas fa-route"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="totalRidesCount">0</span>
+                                <span class="stat-label">Total Rides</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-check-circle"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="completedRidesCount">0</span>
+                                <span class="stat-label">Completed</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-clock"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="pendingRidesCount">0</span>
+                                <span class="stat-label">Pending</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-car"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="inProgressRidesCount">0</span>
+                                <span class="stat-label">In Progress</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3>All Rides</h3>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table id="rides-table" class="modern-table">
+                                <thead>
+                                    <tr>
+                                        <th>Ride ID</th>
+                                        <th>Passenger</th>
+                                        <th>Driver</th>
+                                        <th>Trip Details</th>
+                                        <th>Fare</th>
+                                        <th>Status</th>
+                                        <th>Date/Time</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="adminPaymentsPanel" class="panel hidden">
+                    <div class="admin-panel-header">
+                        <h2><i class="fas fa-credit-card"></i> Manage Payments</h2>
+                    </div>
+
+                    <div class="payments-stats">
+                        <div class="stat-card">
+                            <i class="fas fa-credit-card"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="totalPaymentsCount">0</span>
+                                <span class="stat-label">Total Payments</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-dollar-sign"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="totalPaymentsAmount">$0</span>
+                                <span class="stat-label">Total Amount</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-calendar-day"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="todayPaymentsCount">0</span>
+                                <span class="stat-label">Today</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3>All Payments</h3>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table id="payments-table" class="modern-table">
+                                <thead>
+                                    <tr>
+                                        <th>Payment ID</th>
+                                        <th>Ride ID</th>
+                                        <th>User ID</th>
+                                        <th>Amount</th>
+                                        <th>Method</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="adminEarningsPanel" class="panel hidden">
+                    <div class="admin-panel-header">
+                        <h2><i class="fas fa-chart-line"></i> Manage Earnings</h2>
+                    </div>
+
+                    <div class="earnings-stats">
+                        <div class="stat-card">
+                            <i class="fas fa-coins"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="totalEarningsCount">0</span>
+                                <span class="stat-label">Total Records</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-dollar-sign"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="totalEarningsAmount">$0</span>
+                                <span class="stat-label">Total Earnings</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-percentage"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="totalServiceFees">$0</span>
+                                <span class="stat-label">Service Fees</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-calendar-day"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="todayEarningsAmount">$0</span>
+                                <span class="stat-label">Today's Earnings</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3>All Earnings</h3>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table id="earnings-table" class="modern-table">
+                                <thead>
+                                    <tr>
+                                        <th>Earning ID</th>
+                                        <th>Driver ID</th>
+                                        <th>Ride ID</th>
+                                        <th>Amount</th>
+                                        <th>Service Fee</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="adminProfilePanel" class="panel hidden">
+                    <div class="admin-panel-header">
+                        <h2><i class="fas fa-user-cog"></i> My Admin Profile</h2>
+                    </div>
+                    
+                    <div class="profile-container">
+                        <div class="profile-card">
+                            <div class="profile-header">
+                                <i class="fas fa-user-shield"></i>
+                                <h3>Administrator Information</h3>
+                            </div>
+                            <div class="profile-info">
+                                <div class="info-item">
+                                    <strong><i class="fas fa-id-badge"></i> Admin ID:</strong> 
+                                    <span id="adminProfileIdDisplay">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <strong><i class="fas fa-user"></i> Name:</strong> 
+                                    <span id="adminProfileNameDisplay">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <strong><i class="fas fa-envelope"></i> Email:</strong> 
+                                    <span id="adminProfileEmailDisplay">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-container">
+                            <div class="form-header">
+                                <h3><i class="fas fa-edit"></i> Update Profile</h3>
+                            </div>
+                            <div id="adminProfileResult" class="message hidden"></div>
+                            
+                            <div class="form-grid">
+                                <div class="form-section">
+                                    <h4>Profile Information</h4>
+                                    <div class="form-group">
+                                        <label for="adminProfileName">Name:</label>
+                                        <input type="text" id="adminProfileName" placeholder="Enter your full name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="adminProfileEmail">Email:</label>
+                                        <input type="email" id="adminProfileEmail" placeholder="Enter your email address">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="adminProfilePassword">New Password (leave blank to keep current):</label>
+                                        <input type="password" id="adminProfilePassword" placeholder="Enter new password">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="submit-btn" onclick="updateAdminProfile()">
+                                    <i class="fas fa-save"></i> Update Profile
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <div id="driverPanels" class="panel-group hidden">
+                <section id="driverDashboardPanel" class="panel">
+                    <div class="admin-panel-header">
+                        <h2><i class="fas fa-tachometer-alt"></i> Driver Dashboard</h2>
+                        <div class="admin-actions">
+                            <button class="toggle-availability-btn" onclick="toggleAvailability()">
+                                <i class="fas fa-power-off"></i> Toggle Availability
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="driver-stats">
+                        <div class="stat-card availability-card">
+                            <i class="fas fa-car-side"></i>
+                            <div class="stat-info">
+                                <span class="stat-label">Status</span>
+                                <span class="stat-number" id="driver-availability-status">Loading...</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-route"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="driver-total-rides">0</span>
+                                <span class="stat-label">Total Rides</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-dollar-sign"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="driver-total-earnings">RM0.00</span>
+                                <span class="stat-label">Total Earnings</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-clock"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="driver-pending-rides">0</span>
+                                <span class="stat-label">Pending Rides</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3>Upcoming/Pending Rides</h3>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table id="driver-upcoming-rides-table" class="modern-table">
+                                <thead>
+                                    <tr>
+                                        <th>Passenger</th>
+                                        <th>Pickup</th>
+                                        <th>DroOff</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="driverRidesPanel" class="panel hidden">
+                    <div class="admin-panel-header">
+                        <h2><i class="fas fa-route"></i> My Rides</h2>
+                    </div>
+
+                    <div class="driver-rides-stats">
+                        <div class="stat-card">
+                            <i class="fas fa-route"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="driverTotalRidesCount">0</span>
+                                <span class="stat-label">Total Rides</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-check-circle"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="driverCompletedRidesCount">0</span>
+                                <span class="stat-label">Completed</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-clock"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="driverPendingRidesCount">0</span>
+                                <span class="stat-label">Pending</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3>All My Rides</h3>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table id="driver-all-rides-table" class="modern-table">
+                                <thead>
+                                    <tr>
+                                        <th>Ride ID</th>
+                                        <th>Passenger</th>
+                                        <th>Pickup</th>
+                                        <th>Dropoff</th>
+                                        <th>Fare</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="driverEarningsPanel" class="panel hidden">
+                    <div class="admin-panel-header">
+                        <h2><i class="fas fa-chart-line"></i> My Earnings</h2>
+                    </div>
+
+                    <div class="driver-earnings-stats">
+                        <div class="stat-card">
+                            <i class="fas fa-coins"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="driverTotalEarningsAmount">RM0.00</span>
+                                <span class="stat-label">Total Earnings</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-calendar-day"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="driverTodayEarnings">RM0.00</span>
+                                <span class="stat-label">Today's Earnings</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-calendar-week"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="driverWeekEarnings">RM0.00</span>
+                                <span class="stat-label">This Week</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-calendar"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="driverMonthEarnings">RM0.00</span>
+                                <span class="stat-label">This Month</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3>All My Earnings</h3>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table id="driver-earnings-table" class="modern-table">
+                                <thead>
+                                    <tr>
+                                        <th>Earning ID</th>
+                                        <th>Ride ID</th>
+                                        <th>Amount</th>
+                                        <th>Service Fee</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="driverProfilePanel" class="panel hidden">
+                    <div class="admin-panel-header">
+                        <h2><i class="fas fa-user-circle"></i> My Driver Profile</h2>
+                        <div class="admin-actions">
+                            <button class="add-btn" onclick="document.getElementById('driverProfileForm').style.display = document.getElementById('driverProfileForm').style.display === 'none' ? 'block' : 'none';">
+                                <i class="fas fa-edit"></i> Edit Profile
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="profile-overview-card">
+                        <div class="profile-avatar">
+                            <div class="avatar-circle">
+                                <i class="fas fa-car"></i>
+                            </div>
+                        </div>
+                        <div class="profile-info-display">
+                            <div class="profile-name">
+                                <span id="driverProfileNameDisplay">Loading...</span>
+                            </div>
+                            <div class="profile-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-id-card"></i>
+                                    <span class="detail-label">Driver ID:</span>
+                                    <span class="detail-value" id="driverProfileIdDisplay">-</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-envelope"></i>
+                                    <span class="detail-label">Email:</span>
+                                    <span class="detail-value" id="driverProfileEmailDisplay">-</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span class="detail-label">Phone:</span>
+                                    <span class="detail-value" id="driverProfilePhoneDisplay">-</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-id-badge"></i>
+                                    <span class="detail-label">License:</span>
+                                    <span class="detail-value" id="driverProfileLicenseDisplay">-</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-car-side"></i>
+                                    <span class="detail-label">Vehicle:</span>
+                                    <span class="detail-value" id="driverProfileVehicleDetailsDisplay">-</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-toggle-on"></i>
+                                    <span class="detail-label">Status:</span>
+                                    <span class="detail-value" id="driverProfileAvailabilityDisplay">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="driverProfileForm" class="form-card" style="display: none;">
+                        <div class="form-header">
+                            <h3><i class="fas fa-user-edit"></i> Update Driver Profile Information</h3>
+                            <button class="close-form-btn" onclick="document.getElementById('driverProfileForm').style.display = 'none';">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div id="driverProfileResult" class="message hidden"></div>
+                        <div class="form-grid">
+                            <div class="form-section">
+                                <h4><i class="fas fa-user"></i> Personal Information</h4>
+                                <div class="form-group">
+                                    <label for="driverProfileName"><i class="fas fa-signature"></i> Full Name</label>
+                                    <input type="text" id="driverProfileName" placeholder="Enter your full name" required>
+                                    <small class="form-text">Your name as it appears on official documents</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="driverProfileEmail"><i class="fas fa-envelope"></i> Email Address</label>
+                                    <input type="email" id="driverProfileEmail" placeholder="your.email@example.com" required>
+                                    <small class="form-text">We'll send ride notifications to this email</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="driverProfilePhone"><i class="fas fa-phone"></i> Phone Number</label>
+                                    <input type="tel" id="driverProfilePhone" placeholder="+60123456789" required>
+                                    <small class="form-text">Passengers will contact you on this number</small>
+                                </div>
+                            </div>
+                            <div class="form-section">
+                                <h4><i class="fas fa-car"></i> Driver & Vehicle Information</h4>
+                                <div class="form-group">
+                                    <label for="driverProfileLicenseNumber"><i class="fas fa-id-badge"></i> License Number</label>
+                                    <input type="text" id="driverProfileLicenseNumber" placeholder="Enter your license number" required>
+                                    <small class="form-text">Your driving license number</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="driverProfileVehicleDetails"><i class="fas fa-car-side"></i> Vehicle Details</label>
+                                    <input type="text" id="driverProfileVehicleDetails" placeholder="e.g., Toyota Camry 2020" required>
+                                    <small class="form-text">Make, model, and year of your vehicle</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="driverProfileIsAvailable"><i class="fas fa-toggle-on"></i> Availability Status</label>
+                                    <select id="driverProfileIsAvailable">
+                                        <option value="true">Available for rides</option>
+                                        <option value="false">Not available</option>
+                                    </select>
+                                    <small class="form-text">Toggle your availability to receive ride requests</small>
+                                </div>
+                            </div>
+                            <div class="form-section">
+                                <h4><i class="fas fa-shield-alt"></i> Security Settings</h4>
+                                <div class="form-group">
+                                    <label for="driverProfilePassword"><i class="fas fa-lock"></i> New Password</label>
+                                    <input type="password" id="driverProfilePassword" placeholder="Leave blank to keep current password">
+                                    <small class="form-text">Password must be at least 8 characters long</small>
+                                </div>
+                                <div class="form-group" style="margin-top: 30px;">
+                                    <div style="background: linear-gradient(135deg, #e8f5e8 0%, #f0fff0 100%); border-radius: 10px; padding: 15px; border: 1px solid #81c784;">
+                                        <h5 style="margin: 0 0 10px 0; color: #2e7d32; display: flex; align-items: center; gap: 8px;">
+                                            <i class="fas fa-car"></i> Driver Safety & Security
+                                        </h5>
+                                        <ul style="margin: 0; padding-left: 20px; color: #2e7d32; font-size: 0.9em;">
+                                            <li>Your personal information is encrypted and secure</li>
+                                            <li>Only verified passengers can see your contact details</li>
+                                            <li>You can update your availability status anytime</li>
+                                            <li>All rides are tracked for safety and security</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" class="submit-btn" onclick="updateDriverProfile()">
+                                        <i class="fas fa-save"></i> Update Profile
+                                    </button>
+                                    <button type="button" class="delete-btn" onclick="deleteDriverAccount()">
+                                        <i class="fas fa-trash-alt"></i> Delete Account
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div id="passengerPanels" class="panel-group hidden">
+                <section id="passengerDashboardPanel" class="panel">
+                    <div class="admin-panel-header">
+                        <h2><i class="fas fa-tachometer-alt"></i> My Dashboard</h2>
+                        <div class="admin-actions">
+                            <button class="add-btn" onclick="document.getElementById('newRideForm').style.display = document.getElementById('newRideForm').style.display === 'none' ? 'block' : 'none';">
+                                <i class="fas fa-plus"></i> Request New Ride
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="passenger-stats">
+                        <div class="stat-card">
+                            <i class="fas fa-route"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="passenger-total-rides">0</span>
+                                <span class="stat-label">Total Rides</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-dollar-sign"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="passenger-total-spent">RM0.00</span>
+                                <span class="stat-label">Total Spent</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-clock"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="passenger-pending-rides">0</span>
+                                <span class="stat-label">Pending Rides</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-star"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="passenger-completed-rides">0</span>
+                                <span class="stat-label">Completed Rides</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="newRideForm" class="form-card" style="display: none;">
+                        <div class="form-header">
+                            <h3><i class="fas fa-route"></i> Request a New Ride</h3>
+                            <button class="close-form-btn" onclick="document.getElementById('newRideForm').style.display = 'none';">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div id="requestRideMessage" class="message hidden"></div>
+                        <div class="form-grid">
+                            <div class="form-section">
+                                <h4><i class="fas fa-map-marked-alt"></i> Trip Details</h4>
+                                <div class="form-group">
+                                    <label for="pickupLocation"><i class="fas fa-map-marker-alt"></i> Pickup Location</label>
+                                    <div class="location-input-wrapper">
+                                        <input type="text" id="pickupLocation" placeholder="Enter your pickup address" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="dropoffLocation"><i class="fas fa-flag-checkered"></i> Destination</label>
+                                    <div class="location-input-wrapper">
+                                        <input type="text" id="dropoffLocation" placeholder="Where would you like to go?" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="passengerCount"><i class="fas fa-users"></i> Number of Passengers</label>
+                                    <div class="passenger-count-wrapper">
+                                        <input type="number" id="passengerCount" min="1" max="8" value="1" required>
+                                    </div>
+                                    <small class="form-text">Maximum 8 passengers per ride</small>
+                                </div>
+                            </div>
+                            <div class="form-section">
+                                <h4><i class="fas fa-credit-card"></i> Payment & Booking</h4>
+                                <div class="form-group">
+                                    <label for="paymentMethod"><i class="fas fa-wallet"></i> Payment Method</label>
+                                    <div class="payment-select-wrapper">
+                                        <select id="paymentMethod" required>
+                                            <option value="">Choose your payment method</option>
+                                            <option value="cash">💵 Cash Payment</option>
+                                            <option value="credit_card">💳 Credit Card</option>
+                                            <option value="debit_card">💳 Debit Card</option>
+                                            <option value="digital_wallet">📱 Digital Wallet (GrabPay, TouchNGo)</option>
+                                            <option value="bank_transfer">🏦 Online Banking</option>
+                                        </select>
+                                    </div>
+                                    <small class="form-text">Select your preferred payment method</small>
+                                </div>
+                                <div class="form-group" style="margin-top: 30px;">
+                                    <div style="background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%); border-radius: 10px; padding: 15px; border: 1px solid #d4edda;">
+                                        <h5 style="margin: 0 0 10px 0; color: #155724; display: flex; align-items: center; gap: 8px;">
+                                            <i class="fas fa-info-circle"></i> Ride Information
+                                        </h5>
+                                        <ul style="margin: 0; padding-left: 20px; color: #155724; font-size: 0.9em;">
+                                            <li>Estimated arrival: 5-10 minutes</li>
+                                            <li>Fare will be calculated based on distance</li>
+                                            <li>You can cancel anytime before driver acceptance</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" class="submit-btn" onclick="requestRide()">
+                                        <i class="fas fa-taxi"></i> Request My Ride
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3>My Recent Rides</h3>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table id="passenger-recent-rides-table" class="modern-table">
+                                <thead>
+                                    <tr>
+                                        <th>Ride ID</th>
+                                        <th>Driver</th>
+                                        <th>Trip Details</th>
+                                        <th>Fare</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="passengerRidesPanel" class="panel hidden">
+                    <div class="admin-panel-header">
+                        <h2><i class="fas fa-route"></i> My Rides</h2>
+                    </div>
+
+                    <div class="passenger-rides-stats">
+                        <div class="stat-card">
+                            <i class="fas fa-clock"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="passengerPendingRidesCount">0</span>
+                                <span class="stat-label">Pending Rides</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-spinner"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="passengerInProgressRidesCount">0</span>
+                                <span class="stat-label">In Progress</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-check-circle"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="passengerCompletedRidesCount">0</span>
+                                <span class="stat-label">Completed</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-times-circle"></i>
+                            <div class="stat-info">
+                                <span class="stat-number" id="passengerCancelledRidesCount">0</span>
+                                <span class="stat-label">Cancelled</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Single Unified Rides Table -->
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3>All My Rides</h3>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table id="passenger-all-rides-table" class="modern-table">
+                                <thead>
+                                    <tr>
+                                        <th>Driver Info</th>
+                                        <th>Trip Details</th>
+                                        <th>Payment Method</th>
+                                        <th>Fare</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Passenger Profile -->
+                <section id="passengerProfilePanel" class="panel hidden">
+                    <div class="admin-panel-header">
+                        <h2><i class="fas fa-user-circle"></i> My Profile</h2>
+                        <div class="admin-actions">
+                            <button class="add-btn" onclick="document.getElementById('passengerProfileForm').style.display = document.getElementById('passengerProfileForm').style.display === 'none' ? 'block' : 'none';">
+                                <i class="fas fa-edit"></i> Edit Profile
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="profile-overview-card">
+                        <div class="profile-avatar">
+                            <div class="avatar-circle">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        </div>
+                        <div class="profile-info-display">
+                            <div class="profile-name">
+                                <span id="passengerProfileNameDisplay">Loading...</span>
+                            </div>
+                            <div class="profile-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-id-card"></i>
+                                    <span class="detail-label">User ID:</span>
+                                    <span class="detail-value" id="passengerProfileIdDisplay">-</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-envelope"></i>
+                                    <span class="detail-label">Email:</span>
+                                    <span class="detail-value" id="passengerProfileEmailDisplay">-</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span class="detail-label">Phone:</span>
+                                    <span class="detail-value" id="passengerProfilePhoneDisplay">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="passengerProfileForm" class="form-card" style="display: none;">
+                        <div class="form-header">
+                            <h3><i class="fas fa-user-edit"></i> Update Profile Information</h3>
+                            <button class="close-form-btn" onclick="document.getElementById('passengerProfileForm').style.display = 'none';">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div id="passengerProfileResult" class="message hidden"></div>
+                        <div class="form-grid">
+                            <div class="form-section">
+                                <h4><i class="fas fa-user"></i> Personal Information</h4>
+                                <div class="form-group">
+                                    <label for="passengerProfileName"><i class="fas fa-signature"></i> Full Name</label>
+                                    <input type="text" id="passengerProfileName" placeholder="Enter your full name" required>
+                                    <small class="form-text">Your name as it appears on official documents</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="passengerProfileEmail"><i class="fas fa-envelope"></i> Email Address</label>
+                                    <input type="email" id="passengerProfileEmail" placeholder="your.email@example.com" required>
+                                    <small class="form-text">We'll send ride confirmations to this email</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="passengerProfilePhone"><i class="fas fa-phone"></i> Phone Number</label>
+                                    <input type="tel" id="passengerProfilePhone" placeholder="+60123456789" required>
+                                    <small class="form-text">Driver will contact you on this number</small>
+                                </div>
+                            </div>
+                            <div class="form-section">
+                                <h4><i class="fas fa-shield-alt"></i> Security Settings</h4>
+                                <div class="form-group">
+                                    <label for="passengerProfilePassword"><i class="fas fa-lock"></i> New Password</label>
+                                    <input type="password" id="passengerProfilePassword" placeholder="Leave blank to keep current password">
+                                    <small class="form-text">Password must be at least 8 characters long</small>
+                                </div>
+                                <div class="form-group" style="margin-top: 30px;">
+                                    <div style="background: linear-gradient(135deg, #e3f2fd 0%, #f0f8ff 100%); border-radius: 10px; padding: 15px; border: 1px solid #bbdefb;">
+                                        <h5 style="margin: 0 0 10px 0; color: #1565c0; display: flex; align-items: center; gap: 8px;">
+                                            <i class="fas fa-shield-alt"></i> Privacy & Security
+                                        </h5>
+                                        <ul style="margin: 0; padding-left: 20px; color: #1565c0; font-size: 0.9em;">
+                                            <li>Your information is encrypted and secure</li>
+                                            <li>We never share your data with third parties</li>
+                                            <li>You can update your preferences anytime</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" class="submit-btn" onclick="updatePassengerProfile()">
+                                        <i class="fas fa-save"></i> Update Profile
+                                    </button>
+                                    <button type="button" class="delete-btn" onclick="deletePassengerAccount()">
+                                        <i class="fas fa-trash-alt"></i> Delete Account
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
