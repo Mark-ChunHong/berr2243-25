@@ -53,10 +53,10 @@ app.post('/auth/admin/login', async (req, res) => {
 });
 
 app.post('/auth/login', async (req, res) => {
-    const { Email, Password } = req.body;
+    const { email, password } = req.body;
     try {
-        const user = await db.collection('users').findOne({ Email });
-        if (!user || user.Password !== Password) {
+        const user = await db.collection('users').findOne({ email });
+        if (!user || user.password !== password) {
             return res.status(401).json({ error: "Invalid email or password" });
         }
         res.status(200).json({
@@ -70,10 +70,10 @@ app.post('/auth/login', async (req, res) => {
 });
 
 app.post('/auth/driver/login', async (req, res) => {
-    const { driverId, Password } = req.body;
+    const { driverId, password } = req.body;
     try {
-        const driver = await db.collection('drivers').findOne({ Driver_ID: driverId });
-        if (!driver || driver.Password !== Password) {
+        const driver = await db.collection('drivers').findOne({ driverId: driverId });
+        if (!driver || driver.password !== password) {
             return res.status(401).json({ error: "Invalid driver ID or password" });
         }
         res.status(200).json({
@@ -88,16 +88,16 @@ app.post('/auth/driver/login', async (req, res) => {
 
 // ---------- USERS ----------
 app.post('/users', async (req, res) => {
-    const { Email, Password, Name } = req.body;
-    if (!Email || !Password || !Name) {
+    const { email, password, name } = req.body;
+    if (!email || !password || !name) {
         return res.status(400).json({ error: "Missing required fields" });
     }
-    const existingUser = await db.collection('users').findOne({ Email });
+    const existingUser = await db.collection('users').findOne({ email });
     if (existingUser) {
         return res.status(409).json({ error: "User already exists" });
     }
     const result = await db.collection('users').insertOne({
-        Email, Password, Name, Registration_Date: new Date(), Delete_Account: false
+        email, password, name, Registration_Date: new Date(), Delete_Account: false
     });
     res.status(201).json({ id: result.insertedId });
 });
@@ -134,7 +134,7 @@ app.patch('/drivers/:id/status', roleAuth(['driver', 'admin']), async (req, res)
 });
 
 app.get('/drivers/:id/earnings', roleAuth(['driver', 'admin']), async (req, res) => {
-    const earnings = await db.collection('earning').find({ Driver_ID: req.params.id }).toArray();
+    const earnings = await db.collection('earning').find({ driverId: req.params.id }).toArray();
     if (!earnings.length) return res.status(404).json({ error: "No earnings found" });
     const total = earnings.reduce((sum, e) => sum + e.Total_Earn, 0);
     res.status(200).json({ earnings, total });
@@ -143,7 +143,7 @@ app.get('/drivers/:id/earnings', roleAuth(['driver', 'admin']), async (req, res)
 app.get('/drivers/:id', roleAuth(['user', 'admin']), async (req, res) => {
     const driver = await db.collection('drivers').findOne({ _id: new ObjectId(req.params.id) });
     if (!driver) return res.status(404).json({ error: "Driver not found" });
-    const { Password, ...driverData } = driver;
+    const { password, ...driverData } = driver;
     res.status(200).json(driverData);
 });
 
@@ -151,7 +151,7 @@ app.get('/drivers/:id', roleAuth(['user', 'admin']), async (req, res) => {
 app.get('/passengers/:id', roleAuth(['driver', 'admin']), async (req, res) => {
     const passenger = await db.collection('users').findOne({ _id: new ObjectId(req.params.id) });
     if (!passenger) return res.status(404).json({ error: "Passenger not found" });
-    const { Password, ...data } = passenger;
+    const { password, ...data } = passenger;
     res.status(200).json(data);
 });
 
@@ -162,8 +162,8 @@ app.get('/admin/analytics', roleAuth(['admin']), async (req, res) => {
     const rides = await db.collection('rides').countDocuments();
     const payments = await db.collection('payments').countDocuments();
     const earnings = await db.collection('earning').find().toArray();
-    const totalEarnings = earnings.reduce((sum, e) => sum + e.Total_Earn, 0);
-    res.status(200).json({ users, drivers, rides, payments, totalEarnings });
+    const totalEarn = earnings.reduce((sum, e) => sum + e.totalEarn, 0);
+    res.status(200).json({ users, drivers, rides, payments, totalEarn });
 });
 
 // ---------- RIDES ----------
@@ -173,18 +173,18 @@ app.get('/rides', roleAuth(['user', 'driver', 'admin']), async (req, res) => {
 });
 
 app.post('/rides', roleAuth(['user']), async (req, res) => {
-    const { User_ID, Pick_up, Destination } = req.body;
-    if (!User_ID || !Pick_up || !Destination) {
+    const { userId, pickUp, destination } = req.body;
+    if (!userId || !pickUp || !destination) {
         return res.status(400).json({ error: "Missing required fields" });
     }
-    const user = await db.collection('users').findOne({ User_ID });
+    const user = await db.collection('users').findOne({ userId });
     if (!user) return res.status(404).json({ error: "User not found" });
 
     const ride = {
-        User_ID, Pick_up, Destination,
-        Status: "pending",
-        Start_Time: new Date(),
-        Created_At: new Date()
+        userId, pickUp, destination,
+        status: "pending",
+        startTime: new Date(),
+        endTime: new Date()
     };
     const result = await db.collection('rides').insertOne(ride);
     res.status(201).json({ id: result.insertedId });
@@ -200,8 +200,8 @@ app.patch('/rides/:id', roleAuth(['driver', 'admin']), async (req, res) => {
     const update = {
         $set: {
             status,
-            ...(status === "completed" && { End_Time: new Date() }),
-            ...(status === "in-progress" && { Start_Time: new Date() })
+            ...(status === "completed" && { endTime: new Date() }),
+            ...(status === "in-progress" && { startTime: new Date() })
         }
     };
     const result = await db.collection('rides').updateOne({ _id: new ObjectId(req.params.id) }, update);
